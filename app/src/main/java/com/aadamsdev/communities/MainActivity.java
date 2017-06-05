@@ -49,10 +49,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private double currentLatitude;
     private double currentLongitude;
 
+    private String username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        username= "Andrew";
 
         loadPermissions(Manifest.permission.ACCESS_FINE_LOCATION, 0);
 
@@ -69,7 +73,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
 
         try {
-            socket = IO.socket("http://192.168.1.5:3000/");
+//            socket = IO.socket("http://192.168.1.5:3000/");
+            socket = IO.socket("http://192.168.0.15:3000/");
+
         } catch (URISyntaxException ex) {
             Log.i("Main", ex.toString());
         }
@@ -91,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 //            e.printStackTrace();
 //        }
 
-        socket.emit("chat message", message);
+        socket.emit(SocketEvents.MESSAGE, message);
     }
 
     @Override
@@ -141,13 +147,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             JSONObject coordinates = new JSONObject();
 
             try {
+                coordinates.put("username", username);
                 coordinates.put("latitude", currentLatitude);
                 coordinates.put("longitude", currentLongitude);
-                Log.i("Main", coordinates.length() + "");
 
                 socket.connect();
-                socket.emit("location", coordinates);
-
+                socket.emit(SocketEvents.NEW_CLIENT, coordinates);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
