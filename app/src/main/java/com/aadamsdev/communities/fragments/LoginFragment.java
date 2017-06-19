@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +21,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
     private String email, password;
 
-    private EditText usernameField;
-    private EditText passwordField;
+    private EditText usernameField,passwordField;
 
     private Button loginButton;
 
-    private Context context;
+    private ChatFragment chatFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,7 +37,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.login_fragment, container, false);
 
-//        Button loginButton = (Button) view.findViewById(R.id.btn_login);
+        loginButton = (Button) view.findViewById(R.id.login_button);
+        loginButton.setOnClickListener(LoginFragment.this);
 //
 //        usernameField = (EditText) view.findViewById(R.id.emailTextInputLayout);
 //        passwordField = (EditText) view.findViewById(R.id.passwordTextInputLayout);
@@ -151,10 +152,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
             case (R.id.login_button):
 
-                Toast.makeText(getContext(), "Logging in..", Toast.LENGTH_SHORT).show();
+                chatFragment = new ChatFragment();
 
-                email = usernameField.getText().toString();
-                password = passwordField.getText().toString();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.activity_main, chatFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+
+                Toast.makeText(getContext(), "ChatFragment", Toast.LENGTH_SHORT).show();
 
                 break;
         }
