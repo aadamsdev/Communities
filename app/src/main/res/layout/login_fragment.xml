@@ -18,6 +18,9 @@
 
     <!-- Email Label -->
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/emailTextInputLayout"
+        android:layout_below="@+id/logoView"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -26,10 +29,8 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
 
-        android:id="@+id/emailTextInputLayout"
-        android:layout_below="@+id/logoView"
-        android:inputType="textEmailAddress"
 
+        android:inputType="textEmailAddress"
         android:textColor="@color/colorPrimary"
         android:textColorHint="@color/colorText">
 
@@ -43,6 +44,9 @@
 
     <!-- Password Label -->
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/passwordTextInputLayout"
+        android:layout_below="@+id/emailTextInputLayout"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -51,11 +55,10 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
 
-        android:id="@+id/passwordTextInputLayout"
-        android:layout_below="@+id/emailTextInputLayout"
         android:inputType="textPassword"
         android:textColor="@color/colorText"
         android:textColorHint="@color/colorText">
+
         <EditText android:id="@+id/input_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
