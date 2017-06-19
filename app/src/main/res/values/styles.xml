@@ -8,4 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AccentButton" parent="Base.TextAppearance.AppCompat.Button" >
+        <item name="backgroundTint">@color/colorAccent</item>
+    </style>
+
+    <style name="PrimaryButton" parent="Base.TextAppearance.AppCompat.Button" >
+        <item name="backgroundTint">@color/colorPrimary</item>
+    </style>
+
 </resources>

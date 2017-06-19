@@ -5,22 +5,13 @@
     android:background="@drawable/background"
     android:gravity="center">
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="128dp"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/splash_logo"
-        />
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/logo"
 
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="112dp"
 
         android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"
@@ -41,8 +32,8 @@
         android:layout_centerHorizontal="true"
 
         android:text="Sign up"
-        android:backgroundTint="@color/colorAccent"
-        android:textColor="@color/colorPrimary"
+        style="@style/PrimaryButton"
+        android:textColor="@color/colorAccent"
         />
 
     <Button
@@ -56,9 +47,8 @@
         android:layout_centerHorizontal="true"
 
         android:text="Login"
-        android:backgroundTint="@color/colorAccent"
+        style="@style/AccentButton"
         android:textColor="@color/colorPrimary"
         />
-
 
 </RelativeLayout>
