@@ -9,46 +9,36 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="112dp"
-
-        android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"
-
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="112dp"
+        android:layout_marginTop="8dp"
         android:text="Communities"
-        android:textSize="34dp"
         android:textColor="@color/colorText"
-        />
+        android:textSize="34dp" />
 
     <Button
         android:id="@+id/signup_button"
+        style="@style/PrimaryButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
-
+        android:layout_centerHorizontal="true"
         android:layout_marginLeft="36dp"
         android:layout_marginRight="36dp"
-        android:layout_centerHorizontal="true"
-
         android:text="Sign up"
-        style="@style/PrimaryButton"
-        android:textColor="@color/colorAccent"
-        />
+        android:textColor="@color/colorAccent" />
 
     <Button
         android:id="@+id/login_button"
+        style="@style/AccentButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/signup_button"
-
+        android:layout_centerHorizontal="true"
         android:layout_marginLeft="36dp"
         android:layout_marginRight="36dp"
-        android:layout_centerHorizontal="true"
-
         android:text="Login"
-        style="@style/AccentButton"
-        android:textColor="@color/colorPrimary"
-        />
+        android:textColor="@color/colorPrimary" />
 
 </RelativeLayout>
