@@ -6,53 +6,44 @@
     android:clickable="true"
     android:orientation="vertical">
 
-    <ScrollView
+    <ListView
         android:id="@+id/chat_scrollview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/send_message_layout">
 
-        <LinearLayout
-            android:id="@+id/chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-        </LinearLayout>
-    </ScrollView>
+    </ListView>
 
     <RelativeLayout
         android:id="@+id/send_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
         android:background="@drawable/border">
 
         <EditText
             android:id="@+id/message_field"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="24dp"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/send_button"
             android:layout_toStartOf="@+id/send_button"
             android:background="@color/colorBackground"
-            android:hint="Message chatroom"
-            android:padding="8dp" />
+            android:hint="Message #chatroom" />
 
         <ImageButton
             android:id="@+id/send_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:adjustViewBounds="true"
-            android:backgroundTint="@color/chatBackground"
-            android:cropToPadding="false"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="Send message"
             android:scaleType="fitCenter"
-            android:src="@drawable/send_black" />
+            android:src="@drawable/send_black"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

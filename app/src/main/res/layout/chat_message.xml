@@ -18,7 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
         android:layout_toRightOf="@+id/user_icon"
-        android:text="UserName" />
+        android:text="UserName"
+        android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/message"
@@ -26,8 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/username"
         android:layout_marginTop="8dp"
-        android:layout_toRightOf="@+id/user_icon"
-         />
+        android:layout_toRightOf="@+id/user_icon" />
 
     <TextView
         android:id="@+id/timestamp"

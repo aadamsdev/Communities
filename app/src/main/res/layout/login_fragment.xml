@@ -13,7 +13,8 @@
         android:layout_alignParentTop="true"
         android:layout_gravity="center_horizontal"
         android:elevation="10dp"
-        android:src="@drawable/splash_logo" />
+        android:src="@drawable/splash_logo"
+        android:visibility="invisible"/>
 
 
     <!-- Email Label -->
@@ -25,8 +26,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:inputType="textEmailAddress"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:textColor="@color/colorPrimary"
         android:textColorHint="@color/colorText">
 
