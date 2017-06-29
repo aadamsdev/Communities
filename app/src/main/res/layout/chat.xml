@@ -47,7 +47,7 @@
             android:background="@drawable/send_button"
             android:contentDescription="Send message"
             android:scaleType="fitCenter"
-            android:src="@drawable/send_black"
+            android:src="@drawable/ic_send_black_24dp"
             android:visibility="gone" />
 
     </RelativeLayout>
