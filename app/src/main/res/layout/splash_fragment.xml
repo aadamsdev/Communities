@@ -27,7 +27,7 @@
         android:layout_marginLeft="36dp"
         android:layout_marginRight="36dp"
         android:text="Sign up"
-        android:textColor="@color/colorAccent" />
+        android:textColor="@color/colorText" />
 
     <Button
         android:id="@+id/login_button"
