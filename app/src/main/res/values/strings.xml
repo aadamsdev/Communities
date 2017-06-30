@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Communities</string>
+
+    <string-array name="menu_items">
+        <item>showMap</item>
+    </string-array>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
 </resources>
