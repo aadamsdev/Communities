@@ -4,35 +4,115 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
 /**
  * Created by Andrew Adams on 6/28/2017.
  */
 
-public class ServerClient implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
+public class ChatClient {
 
-    }
+    private static ChatClient client;
+    private Socket socket;
+    private ChatClientCallback chatClientCallback;
 
-    @Override
-    public void onConnectionSuspended(int i) {
+    private final static String HOST_URL = "http://192.168.1.5:3000/";
+    private final static String OUTGOING_MESSAGE = "OUTGOING_MESSAGE";
+    private final static String INCOMING_MESSAGE = "INCOMING_MESSAGE";
 
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    private ChatClient() {
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
+    public static ChatClient getInstance() {
+        if (client == null) {
+            client = new ChatClient();
+        }
+        return client;
+    }
 
+    public void connect() {
+        try {
+            socket = IO.socket(HOST_URL);
+            registerEvents();
+            socket.connect();
+        } catch (URISyntaxException ex) {
+            Log.i("ChatClient", ex.toString());
+        }
+    }
+
+    private void registerEvents() {
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+
+            @Override
+            public void call(Object... args) {
+
+            }
+
+        }).on(INCOMING_MESSAGE, new Emitter.Listener() {
+
+            @Override
+            public void call(final Object... args) {
+                if (chatClientCallback != null) {
+                    JSONObject data = (JSONObject) args[0];
+
+                    try {
+                        String username = data.getString("username");
+                        String message = data.getString("message");
+                        String timestamp = data.getString("timestamp");
+                        int userIconId = data.getInt("userIconId");
+
+                        chatClientCallback.onNewMessage(username, message, timestamp, userIconId);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+
+            @Override
+            public void call(Object... args) {
+            }
+
+        });
+    }
+
+    public void sendMessage(String username, String message) {
+        JSONObject object = new JSONObject();
+
+        try {
+            object.put("username", username);
+            object.put("message", message);
+            object.put("timestamp", "6:23 PM");
+            object.put("userIconId", 0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        socket.emit(OUTGOING_MESSAGE, object);
+    }
+
+    public void registerCallback(ChatClientCallback chatClientCallback) {
+        this.chatClientCallback = chatClientCallback;
+    }
+
+    public interface ChatClientCallback {
+        void onNewMessage(String username, String message, String timestamp, int userIconId);
     }
 }
 
