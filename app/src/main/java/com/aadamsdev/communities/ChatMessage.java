@@ -15,7 +15,7 @@ import org.w3c.dom.Text;
  * Created by Andrew Adams on 6/22/2017.
  */
 
-public class ChatMessage extends RelativeLayout {
+public class ChatMessage {
 
     private ImageView iconImageView;
     private TextView messageTextView;
@@ -28,48 +28,10 @@ public class ChatMessage extends RelativeLayout {
     private String timestamp;
 
     public ChatMessage(Context context, String username, String message, String timestamp, Bitmap userIcon) {
-        super(context);
         this.userIcon = userIcon;
         this.message = message;
         this.username = username;
         this.timestamp = timestamp;
-        init();
-    }
-//
-//    @Override
-//    protected void onFinishInflate() {
-//        super.onFinishInflate();
-//
-//        Log.i("ChatMessage", "onFinishInflate");
-//
-//        iconImageView = (ImageView) findViewById(R.id.user_icon);
-////        iconImageView.setImageBitmap(userIcon);
-//
-//        messageTextView = (TextView) findViewById(R.id.message);
-//        messageTextView.setText(message.toCharArray(), 0, message.length());
-//
-//        usernameTextView = (TextView) findViewById(R.id.username);
-//        usernameTextView.setText(username.toCharArray(), 0, username.length());
-//
-//        timestampTextView = (TextView) findViewById(R.id.timestamp);
-//        timestampTextView.setText(timestamp.toCharArray(), 0, timestamp.length());
-//    }
-
-    private void init(){
-        View view = inflate(getContext(), R.layout.chat_message, this);
-
-        iconImageView = (ImageView) view.findViewById(R.id.user_icon);
-        Log.i("ChatMessage", iconImageView.toString());
-//        iconImageView.setImageBitmap(userIcon);
-
-        messageTextView = (TextView) view.findViewById(R.id.message);
-        messageTextView.setText(message.toCharArray(), 0, message.length());
-
-        usernameTextView = (TextView) view.findViewById(R.id.username);
-        usernameTextView.setText(username.toCharArray(), 0, username.length());
-
-        timestampTextView = (TextView) view.findViewById(R.id.timestamp);
-        timestampTextView.setText(timestamp.toCharArray(), 0, timestamp.length());
     }
 
     public Bitmap getUserIcon() {
@@ -107,6 +69,4 @@ public class ChatMessage extends RelativeLayout {
         this.timestamp = timestamp;
         timestampTextView.setText(timestamp.toCharArray(), 0, timestamp.length());
     }
-
-
 }
