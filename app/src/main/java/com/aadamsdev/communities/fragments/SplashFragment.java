@@ -55,7 +55,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener{
 
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.add(R.id.activity_main, loginFragment);
-                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 
                 break;

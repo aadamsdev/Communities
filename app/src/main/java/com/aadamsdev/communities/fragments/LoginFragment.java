@@ -1,6 +1,5 @@
 package com.aadamsdev.communities.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,7 +24,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
     private Button loginButton;
 
-    private ChatFragment chatFragment;
+    private MainFragment chatFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -152,14 +151,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
 
             case (R.id.login_button):
 
-                chatFragment = new ChatFragment();
+                chatFragment = new MainFragment();
 
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.add(R.id.activity_main, chatFragment);
-                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 
-                Toast.makeText(getContext(), "ChatFragment", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "MainFragment", Toast.LENGTH_SHORT).show();
 
                 break;
         }
