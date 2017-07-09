@@ -4,6 +4,11 @@ package com.aadamsdev.communities.fragments;
  * Created by Andrew Adams on 6/18/2017.
  */
 
+import com.aadamsdev.communities.ChatArrayAdapter;
+import com.aadamsdev.communities.ChatClient;
+import com.aadamsdev.communities.ChatMessage;
+import com.aadamsdev.communities.R;
+
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,23 +18,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.aadamsdev.communities.ChatArrayAdapter;
-import com.aadamsdev.communities.ChatClient;
-import com.aadamsdev.communities.ChatMessage;
-import com.aadamsdev.communities.R;
 
 public class MainFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
 
@@ -124,22 +120,15 @@ public class MainFragment extends Fragment implements View.OnClickListener, Chat
                 chatArrayAdapter.notifyDataSetChanged();
             }
         });
-
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case (R.id.send_button):
-//                ChatMessage chatMessage = new ChatMessage(getContext(), "Andrew", message + " " + count, "6:23 PM", null);
-//                ++count;
-//
-//                chatArrayAdapter.add(chatMessage);
-//                chatArrayAdapter.notifyDataSetChanged();
-
+                messageEditText.getText().clear();
                 String message = messageEditText.getText().toString();
                 chatClient.sendMessage("Andrew", message);
-
                 break;
         }
     }
@@ -179,7 +168,6 @@ public class MainFragment extends Fragment implements View.OnClickListener, Chat
         // Set the list's click listener
 //        drawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
-
 
 
 }
