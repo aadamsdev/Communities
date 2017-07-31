@@ -16,6 +16,8 @@ import com.aadamsdev.communities.fragments.SplashFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 
+import java.util.HashMap;
+
 import io.socket.client.Socket;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +47,47 @@ public class MainActivity extends AppCompatActivity {
         loadPermissions(Manifest.permission.ACCESS_FINE_LOCATION, 0);
 
         splashFragment = new SplashFragment();
+
+        String test = "This is a string";
+        String[] testArray = test.split(" ");
+
+        String result = "";
+
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (String string : testArray) {
+////
+//            for (int i = string.length() - 1; i >= 0 ; --i) {
+//                stringBuilder.append(string.charAt(i));
+////                result += string.charAt(i);
+//            }
+////            result += " ";
+//            stringBuilder.append(" ");
+//        }
+//
+//        result = stringBuilder.toString();
+//        Log.i("Main", result);
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int[] integers = {1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 4, 4};
+
+        for (int num : integers) {
+            if (map.get(num) == null) {
+                map.put(num, 1);
+            } else {
+                map.put(num, map.get(num) + 1);
+            }
+        }
+
+        int mostCommonKey = 0;
+        int mostCommonVal = 0;
+        for (int num : map.keySet()) {
+            if (map.get(num) > mostCommonVal) {
+                mostCommonKey = num;
+                mostCommonVal = map.get(num);
+            }
+        }
+
+        Log.i("Main", mostCommonKey + "");
 
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.activity_main, splashFragment);

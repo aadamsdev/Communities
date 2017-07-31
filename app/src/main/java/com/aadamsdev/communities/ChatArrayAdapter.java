@@ -5,6 +5,8 @@ package com.aadamsdev.communities;
  */
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +63,8 @@ public class ChatArrayAdapter extends BaseAdapter {
         }
 
         ImageView iconImageView = (ImageView) view.findViewById(R.id.user_icon);
-        iconImageView.setImageBitmap(chatMessage.getUserIcon());
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.robot);
+        iconImageView.setImageBitmap(bitmap);
 
         TextView messageTextView = (TextView) view.findViewById(R.id.message);
         messageTextView.setText(chatMessage.getMessage().toCharArray(), 0, chatMessage.getMessage().length());

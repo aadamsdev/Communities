@@ -114,7 +114,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Chat
 
     @Override
     public void onNewMessage(String username, String message, String timestamp, int userIconId) {
-        ChatMessage chatMessage = new ChatMessage(getContext(), "Andrew", message + " " + count, "6:23 PM", null);
+        ChatMessage chatMessage = new ChatMessage(getContext(), "Andrew", message + " " + count, timestamp, null);
         ++count;
 
         chatArrayAdapter.add(chatMessage);
@@ -124,7 +124,6 @@ public class MainFragment extends Fragment implements View.OnClickListener, Chat
                 chatArrayAdapter.notifyDataSetChanged();
             }
         });
-
     }
 
     @Override

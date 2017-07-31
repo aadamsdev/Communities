@@ -64,7 +64,6 @@ public class ChatClient {
             }
 
         }).on(INCOMING_MESSAGE, new Emitter.Listener() {
-
             @Override
             public void call(final Object... args) {
                 if (chatClientCallback != null) {
@@ -98,7 +97,6 @@ public class ChatClient {
         try {
             object.put("username", username);
             object.put("message", message);
-            object.put("timestamp", "6:23 PM");
             object.put("userIconId", 0);
         } catch (JSONException e) {
             e.printStackTrace();
