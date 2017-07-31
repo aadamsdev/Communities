@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,8 +127,10 @@ public class MainFragment extends Fragment implements View.OnClickListener, Chat
     public void onClick(View view) {
         switch (view.getId()) {
             case (R.id.send_button):
-                messageEditText.getText().clear();
                 String message = messageEditText.getText().toString();
+                messageEditText.getText().clear();
+
+                Log.i("MainFragment", message);
                 chatClient.sendMessage("Andrew", message);
                 break;
         }

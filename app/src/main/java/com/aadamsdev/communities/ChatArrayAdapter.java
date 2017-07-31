@@ -63,8 +63,7 @@ public class ChatArrayAdapter extends BaseAdapter {
         }
 
         ImageView iconImageView = (ImageView) view.findViewById(R.id.user_icon);
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.robot);
-        iconImageView.setImageBitmap(bitmap);
+        iconImageView.setImageResource(R.drawable.robot);
 
         TextView messageTextView = (TextView) view.findViewById(R.id.message);
         messageTextView.setText(chatMessage.getMessage().toCharArray(), 0, chatMessage.getMessage().length());

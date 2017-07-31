@@ -1,6 +1,7 @@
 package com.aadamsdev.communities;
 
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -47,7 +48,11 @@ public class ChatClient {
 
     public void connect() {
         try {
-            socket = IO.socket(HOST_URL);
+            if (isEmulator()) {
+                socket = IO.socket("http://10.0.2.2:3000/");
+            } else {
+                socket = IO.socket(HOST_URL);
+            }
             registerEvents();
             socket.connect();
         } catch (URISyntaxException ex) {
@@ -111,6 +116,17 @@ public class ChatClient {
 
     public interface ChatClientCallback {
         void onNewMessage(String username, String message, String timestamp, int userIconId);
+    }
+
+    public boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT);
     }
 }
 
