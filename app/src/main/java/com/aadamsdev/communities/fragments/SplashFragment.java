@@ -1,7 +1,6 @@
 package com.aadamsdev.communities.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,18 +21,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aadamsdev.communities.MainActivity;
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.utils.PreferenceManager;
 
 /**
  * Created by Andrew Adams on 6/10/2017.
  */
-public class SplashFragment extends Fragment implements View.OnClickListener{
+public class SplashFragment extends Fragment {
 
     private View view;
-
-    private LoginFragment loginFragment;
 
     private PreferenceManager preferenceManager;
 
@@ -48,25 +44,16 @@ public class SplashFragment extends Fragment implements View.OnClickListener{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
         // Checking for first time launch - before calling setContentView()
         preferenceManager = new PreferenceManager(getContext());
         if (!preferenceManager.isFirstTimeLaunch()) {
-//            launchHomeScreen();
-//            finish();
+//            launchChatFragment();
         }
-
-        // Making notification bar transparent
-
-
-//        else {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-//        }
-
-
-
     }
 
-    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.splash_fragment, container, false);
 
         if (Build.VERSION.SDK_INT >= 21) {
@@ -105,7 +92,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener{
                     // move to next screen
                     viewPager.setCurrentItem(current);
                 } else {
-//                    launchHomeScreen();
+                    launchChatFragment();
                 }
             }
         });
@@ -113,26 +100,17 @@ public class SplashFragment extends Fragment implements View.OnClickListener{
         return view;
     }
 
-    @Override
-    public void onClick(View view) {
+//    @Override
+//    public void onClick(View view) {
 //        switch (view.getId()) {
-//            case (R.id.login_button):
+//            case (R.id.btn_next)):
 //                Toast.makeText(getContext(), "Logging in..", Toast.LENGTH_SHORT).show();
 //
 //                loginFragment = new LoginFragment();
 //
-//                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-//                fragmentTransaction.add(R.id.activity_main, loginFragment);
-////                fragmentTransaction.addToBackStack(null);
-//                fragmentTransaction.commit();
 //
 //                break;
-//
-//            case (R.id.signup_button):
-//                Toast.makeText(getContext(), "Sign up..", Toast.LENGTH_SHORT).show();
-//                break;
-//        }
-    }
+//    }
 
     private void addBottomDots(int currentPage) {
         dots = new TextView[layouts.length];
@@ -157,11 +135,12 @@ public class SplashFragment extends Fragment implements View.OnClickListener{
         return viewPager.getCurrentItem() + i;
     }
 
-//    private void launchHomeScreen() {
-//        preferenceManager.setFirstTimeLaunch(false);
-//        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
-//        finish();
-//    }
+    private void launchChatFragment() {
+        ChatFragment chatFragment = new ChatFragment();
+        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.activity_main, chatFragment);
+        fragmentTransaction.commit();
+    }
 
     //  viewpager change listener
     ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
@@ -202,10 +181,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    /**
-     * View pager adapter
-     */
-    public class SplashScreenPagerAdapter extends PagerAdapter {
+    private class SplashScreenPagerAdapter extends PagerAdapter {
         private LayoutInflater layoutInflater;
 
         public SplashScreenPagerAdapter() {
