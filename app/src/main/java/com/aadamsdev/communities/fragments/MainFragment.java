@@ -4,9 +4,9 @@ package com.aadamsdev.communities.fragments;
  * Created by Andrew Adams on 6/18/2017.
  */
 
-import com.aadamsdev.communities.ChatArrayAdapter;
-import com.aadamsdev.communities.ChatClient;
-import com.aadamsdev.communities.ChatMessage;
+import com.aadamsdev.communities.chat.ChatArrayAdapter;
+import com.aadamsdev.communities.chat.ChatClient;
+import com.aadamsdev.communities.chat.ChatMessage;
 import com.aadamsdev.communities.R;
 
 import android.database.DataSetObserver;

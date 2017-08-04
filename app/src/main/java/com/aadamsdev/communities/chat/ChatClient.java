@@ -1,4 +1,4 @@
-package com.aadamsdev.communities;
+package com.aadamsdev.communities.chat;
 
 import android.location.Location;
 import android.os.Build;
@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +26,15 @@ import io.socket.emitter.Emitter;
  */
 
 
-public class ChatClient {
+public class ChatClient implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
+    //    //Define a request code to send to Google Play services
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
+    private double currentLatitude;
+    private double currentLongitude;
 
     private static ChatClient client;
     private Socket socket;
@@ -118,7 +127,7 @@ public class ChatClient {
         void onNewMessage(String username, String message, String timestamp, int userIconId);
     }
 
-    public boolean isEmulator() {
+    private boolean isEmulator() {
         return Build.FINGERPRINT.startsWith("generic")
                 || Build.FINGERPRINT.startsWith("unknown")
                 || Build.MODEL.contains("google_sdk")
@@ -128,6 +137,28 @@ public class ChatClient {
                 || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                 || "google_sdk".equals(Build.PRODUCT);
     }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+
 }
 
 //public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {

@@ -1,4 +1,4 @@
-package com.aadamsdev.communities;
+package com.aadamsdev.communities.chat;
 
 /**
  * Created by Andrew Adams on 2017-06-04.

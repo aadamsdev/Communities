@@ -13,7 +13,6 @@
         android:layout_alignParentTop="true"
         android:layout_gravity="center_horizontal"
         android:elevation="10dp"
-        android:src="@drawable/splash_logo"
         android:visibility="invisible"/>
 
 
