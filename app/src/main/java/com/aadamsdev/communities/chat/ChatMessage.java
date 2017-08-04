@@ -1,4 +1,4 @@
-package com.aadamsdev.communities;
+package com.aadamsdev.communities.chat;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -4,12 +4,13 @@ package com.aadamsdev.communities.fragments;
  * Created by Andrew Adams on 6/18/2017.
  */
 
-import com.aadamsdev.communities.ChatArrayAdapter;
-import com.aadamsdev.communities.ChatClient;
-import com.aadamsdev.communities.ChatMessage;
+import com.aadamsdev.communities.chat.ChatArrayAdapter;
+import com.aadamsdev.communities.chat.ChatClient;
+import com.aadamsdev.communities.chat.ChatMessage;
 import com.aadamsdev.communities.R;
 
 import android.database.DataSetObserver;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,10 +28,11 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
-public class MainFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
+public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
 
-    private final String DEBUG_TAG = "MainFragment";
+    private final String DEBUG_TAG = "ChatFragment";
     int count = 0;
 
     private View view;
@@ -54,6 +56,14 @@ public class MainFragment extends Fragment implements View.OnClickListener, Chat
         super.onCreate(savedInstanceState);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            getActivity().getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            Toast.makeText(getContext(), "Hiding action bar...", Toast.LENGTH_SHORT).show();
+        }
 
         chatClient = ChatClient.getInstance();
         chatClient.connect();
@@ -130,7 +140,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Chat
                 String message = messageEditText.getText().toString();
                 messageEditText.getText().clear();
 
-                Log.i("MainFragment", message);
+                Log.i("ChatFragment", message);
                 chatClient.sendMessage("Andrew", message);
                 break;
         }
