@@ -1,16 +1,22 @@
 package com.aadamsdev.communities.chat;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,18 +37,23 @@ public class ChatClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
     //    //Define a request code to send to Google Play services
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
+    // TODO: remove context and place location objects in location manager class
+    private Context context;
+
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private double currentLatitude;
     private double currentLongitude;
 
     private static ChatClient client;
+
     private Socket socket;
     private ChatClientCallback chatClientCallback;
 
     private final static String HOST_URL = "http://192.168.1.5:3000/";
     private final static String OUTGOING_MESSAGE = "OUTGOING_MESSAGE";
     private final static String INCOMING_MESSAGE = "INCOMING_MESSAGE";
+    private final static String LOCATION_UPDATE = "LOCATION_UPDATE";
 
     private ChatClient() {
 
@@ -55,6 +66,10 @@ public class ChatClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
         return client;
     }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     public void connect() {
         try {
             if (isEmulator()) {
@@ -64,13 +79,14 @@ public class ChatClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
             }
             registerEvents();
             socket.connect();
+            initLocationRequest();
         } catch (URISyntaxException ex) {
             Log.i("ChatClient", ex.toString());
         }
     }
 
     private void registerEvents() {
-        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+        socket.on(LOCATION_UPDATE, new Emitter.Listener() {
 
             @Override
             public void call(Object... args) {
@@ -140,7 +156,42 @@ public class ChatClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.i("ChatClient", "!!!!!!!!!!!!!!!!!!");
 
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.i("ChatClient", "Location permission bad");
+            return;
+        }
+
+        Toast.makeText(context, "Sending location", Toast.LENGTH_SHORT).show();
+
+        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        if (location == null) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+
+        } else {
+            //If everything went fine lets get latitude and longitude
+            currentLatitude = location.getLatitude();
+            currentLongitude = location.getLongitude();
+
+            JSONObject coordinates = new JSONObject();
+
+            try {
+                coordinates.put("latitude", currentLatitude);
+                coordinates.put("longitude", currentLongitude);
+
+                socket.connect();
+                socket.emit(LOCATION_UPDATE, coordinates);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            Toast.makeText(context, currentLatitude + " " + currentLongitude, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -155,8 +206,31 @@ public class ChatClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
 
     @Override
     public void onLocationChanged(Location location) {
-
+        currentLatitude = location.getLatitude();
+        currentLongitude = location.getLongitude();
     }
+
+    private void initLocationRequest(){
+        Log.i("ChatClient", "!!!!!!!!!!!!!!!!!!");
+
+        googleApiClient = new GoogleApiClient.Builder(context)
+                // The next two lines tell the new client that “this” current class will handle connection stuff
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                //fourth line adds the LocationServices API endpoint from GooglePlayServices
+                .addApi(LocationServices.API)
+                .build();
+
+        // Create the LocationRequest object
+        locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+
+        //Now lets connect to the API
+        googleApiClient.connect();
+    }
+
 
 
 }

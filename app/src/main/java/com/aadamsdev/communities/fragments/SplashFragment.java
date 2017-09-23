@@ -1,6 +1,7 @@
 package com.aadamsdev.communities.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,12 +26,15 @@ import android.widget.Toast;
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.utils.PreferenceManager;
 
+import static android.content.SharedPreferences.*;
+
 /**
  * Created by Andrew Adams on 6/10/2017.
  */
 public class SplashFragment extends Fragment {
 
     private View view;
+    private Context context;
 
     private PreferenceManager preferenceManager;
 
@@ -45,6 +50,8 @@ public class SplashFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+        context = getContext();
 
         // Checking for first time launch - before calling setContentView()
         preferenceManager = new PreferenceManager(getContext());
@@ -92,6 +99,15 @@ public class SplashFragment extends Fragment {
                     // move to next screen
                     viewPager.setCurrentItem(current);
                 } else {
+                    EditText usernameTextView = (EditText) view.findViewById(R.id.username);
+                    String username = usernameTextView.getText().toString();
+
+                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    Editor editor = sharedPref.edit();
+                    editor.putString(getString(R.string.current_username_key), username);
+                    editor.commit();
+
+                    //TODO: Probably need a loading dialog here...
                     launchChatFragment();
                 }
             }

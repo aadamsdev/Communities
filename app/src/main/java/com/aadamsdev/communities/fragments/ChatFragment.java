@@ -9,6 +9,8 @@ import com.aadamsdev.communities.chat.ChatClient;
 import com.aadamsdev.communities.chat.ChatMessage;
 import com.aadamsdev.communities.R;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,6 +53,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     private ChatClient chatClient;
 
+    private String currentUsername = null;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +70,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         }
 
         chatClient = ChatClient.getInstance();
+        chatClient.setContext(getContext());
         chatClient.connect();
     }
 
@@ -121,7 +126,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     @Override
     public void onNewMessage(String username, String message, String timestamp, int userIconId) {
-        ChatMessage chatMessage = new ChatMessage(getContext(), "Andrew", message + " " + count, timestamp, null);
+        ChatMessage chatMessage = new ChatMessage(getContext(), username, message + " " + count, timestamp, null);
         ++count;
 
         chatArrayAdapter.add(chatMessage);
@@ -141,7 +146,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
                 messageEditText.getText().clear();
 
                 Log.i("ChatFragment", message);
-                chatClient.sendMessage("Andrew", message);
+                if (currentUsername == null) {
+                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    currentUsername = sharedPref.getString(getString(R.string.current_username_key), "");
+                }
+                chatClient.sendMessage(currentUsername, message);
                 break;
         }
     }
