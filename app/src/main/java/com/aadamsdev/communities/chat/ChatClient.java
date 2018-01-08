@@ -55,20 +55,20 @@ public class ChatClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
     private final static String INCOMING_MESSAGE = "INCOMING_MESSAGE";
     private final static String LOCATION_UPDATE = "LOCATION_UPDATE";
 
-    private ChatClient() {
-
+    private ChatClient(Context context) {
+        this.context = context;
     }
 
-    public static ChatClient getInstance() {
+    public static ChatClient getInstance(Context context) {
         if (client == null) {
-            client = new ChatClient();
+            client = new ChatClient(context);
         }
         return client;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
-    }
+//    public void setContext(Context context) {
+//        this.context = context;
+//    }
 
     public void connect() {
         try {

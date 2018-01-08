@@ -8,6 +8,7 @@ import com.aadamsdev.communities.chat.ChatArrayAdapter;
 import com.aadamsdev.communities.chat.ChatClient;
 import com.aadamsdev.communities.chat.ChatMessage;
 import com.aadamsdev.communities.R;
+import com.aadamsdev.communities.utils.PreferenceManager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -36,9 +37,10 @@ import android.widget.Toast;
 
 public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
 
-    private final String DEBUG_TAG = "ChatFragment";
+    private final String TAG = ChatFragment.class.getSimpleName();
     int count = 0;
 
+    private PreferenceManager preferenceManager;
     private View view;
 
     private ChatArrayAdapter chatArrayAdapter;
@@ -75,8 +77,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             Toast.makeText(getContext(), "Hiding action bar...", Toast.LENGTH_SHORT).show();
         }
 
-        chatClient = ChatClient.getInstance();
-        chatClient.setContext(getContext());
+        preferenceManager = PreferenceManager.getInstance(getContext());
+
+        chatClient = ChatClient.getInstance(getContext());
         chatClient.connect();
     }
 
@@ -148,17 +151,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     public void onClick(View view) {
         switch (view.getId()) {
             case (R.id.send_button):
-                String message = messageEditText.getText().toString();
-                messageEditText.getText().clear();
-
-                Log.i("ChatFragment", message);
-                if (currentUsername == null) {
-                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                    currentUsername = sharedPref.getString(getString(R.string.current_username_key), "");
-                }
-                chatClient.sendMessage(currentUsername, message);
+                sendMessage();
                 break;
         }
+    }
+
+    private void sendMessage() {
+        String message = messageEditText.getText().toString();
+        messageEditText.getText().clear();
+
+        currentUsername = preferenceManager.getCurrentUser();
+        chatClient.sendMessage(currentUsername, message);
     }
 
     private void setupDrawerSlider(View view) {
@@ -196,7 +199,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         } catch (NullPointerException ex) {
             Log.i("ChatFragment", ex.toString());
         }
-
 
         // Set the adapter for the list view
         drawerList.setAdapter(new ArrayAdapter<>(getContext(), R.layout.drawer_list_item, menuItems));

@@ -63,7 +63,7 @@ public class SplashFragment extends Fragment {
         context = getContext();
 
         // Checking for first time launch - before calling setContentView()
-        preferenceManager = new PreferenceManager(getContext());
+        preferenceManager = PreferenceManager.getInstance(getContext());
         //TODO: Remove comment to skip splash screen
 //        if (!preferenceManager.isFirstTimeLaunch()) {
 //            launchChatFragment();
@@ -115,10 +115,7 @@ public class SplashFragment extends Fragment {
                     EditText usernameTextView = (EditText) view.findViewById(R.id.username);
                     String username = usernameTextView.getText().toString();
 
-                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                    Editor editor = sharedPref.edit();
-                    editor.putString(getString(R.string.current_username_key), username);
-                    editor.commit();
+                    preferenceManager.setUsername(username);
 
                     //TODO: Probably need a loading dialog here...
                     launchChatActivity();
@@ -144,20 +141,14 @@ public class SplashFragment extends Fragment {
             dotsLayout.addView(dots[i]);
         }
 
-        if (dots.length > 0)
+        if (dots.length > 0) {
             dots[currentPage].setTextColor(colorsActive[currentPage]);
+        }
     }
 
     private int getItem(int i) {
         return viewPager.getCurrentItem() + i;
     }
-
-//    private void launchChatFragment() {
-//        ChatFragment chatFragment = new ChatFragment();
-//        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-//        fragmentTransaction.add(R.id.activity_main, chatFragment);
-//        fragmentTransaction.commit();
-//    }
 
     //  viewpager change listener
     ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {

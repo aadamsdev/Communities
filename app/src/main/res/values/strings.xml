@@ -27,6 +27,4 @@
     <string name="skip">SKIP</string>
     <string name="start">JOIN</string>
 
-    <string name="current_username_key">com.aadamsdev.communities.USERNAME_KEY</string>
-
 </resources>
