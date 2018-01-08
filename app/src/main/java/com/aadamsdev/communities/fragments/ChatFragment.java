@@ -57,6 +57,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     private String currentUsername = null;
 
+    public static ChatFragment newFragment() {
+        return new ChatFragment();
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

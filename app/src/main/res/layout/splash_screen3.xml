@@ -15,7 +15,7 @@
         <ImageView
             android:layout_width="@dimen/img_width_height"
             android:layout_height="@dimen/img_width_height"
-            app:srcCompat="@drawable/ic_location" />
+            app:srcCompat="@drawable/ic_chat_bubble" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -30,6 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
             android:paddingLeft="@dimen/username_padding"
             android:paddingRight="@dimen/username_padding"
             android:textAlignment="center"
