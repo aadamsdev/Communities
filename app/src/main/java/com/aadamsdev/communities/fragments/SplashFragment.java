@@ -1,6 +1,7 @@
 package com.aadamsdev.communities.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -24,7 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aadamsdev.communities.R;
+import com.aadamsdev.communities.activities.ChatActivity;
 import com.aadamsdev.communities.utils.PreferenceManager;
+
+import java.util.ArrayList;
 
 import static android.content.SharedPreferences.*;
 
@@ -45,6 +49,11 @@ public class SplashFragment extends Fragment {
     private int[] layouts;
     private Button btnNext;
 
+
+    public static SplashFragment newFragment() {
+        return new SplashFragment();
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +63,7 @@ public class SplashFragment extends Fragment {
         context = getContext();
 
         // Checking for first time launch - before calling setContentView()
-        preferenceManager = new PreferenceManager(getContext());
+        preferenceManager = PreferenceManager.getInstance(getContext());
         //TODO: Remove comment to skip splash screen
 //        if (!preferenceManager.isFirstTimeLaunch()) {
 //            launchChatFragment();
@@ -71,6 +80,7 @@ public class SplashFragment extends Fragment {
             Toast.makeText(getContext(), "Hiding action bar...", Toast.LENGTH_SHORT).show();
         }
 
+        // TODO IMPLEMENT BUTTERKNIFE FOR VIEW BINDING
         viewPager = (ViewPager) view.findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) view.findViewById(R.id.layoutDots);
         btnNext = (Button) view.findViewById(R.id.btn_next);
@@ -105,31 +115,16 @@ public class SplashFragment extends Fragment {
                     EditText usernameTextView = (EditText) view.findViewById(R.id.username);
                     String username = usernameTextView.getText().toString();
 
-                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                    Editor editor = sharedPref.edit();
-                    editor.putString(getString(R.string.current_username_key), username);
-                    editor.commit();
+                    preferenceManager.setUsername(username);
 
                     //TODO: Probably need a loading dialog here...
-                    launchChatFragment();
+                    launchChatActivity();
                 }
             }
         });
 
         return view;
     }
-
-//    @Override
-//    public void onClick(View view) {
-//        switch (view.getId()) {
-//            case (R.id.btn_next)):
-//                Toast.makeText(getContext(), "Logging in..", Toast.LENGTH_SHORT).show();
-//
-//                loginFragment = new LoginFragment();
-//
-//
-//                break;
-//    }
 
     private void addBottomDots(int currentPage) {
         dots = new TextView[layouts.length];
@@ -146,19 +141,13 @@ public class SplashFragment extends Fragment {
             dotsLayout.addView(dots[i]);
         }
 
-        if (dots.length > 0)
+        if (dots.length > 0) {
             dots[currentPage].setTextColor(colorsActive[currentPage]);
+        }
     }
 
     private int getItem(int i) {
         return viewPager.getCurrentItem() + i;
-    }
-
-    private void launchChatFragment() {
-        ChatFragment chatFragment = new ChatFragment();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.activity_main, chatFragment);
-        fragmentTransaction.commit();
     }
 
     //  viewpager change listener
@@ -198,6 +187,11 @@ public class SplashFragment extends Fragment {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
         }
+    }
+
+    public void launchChatActivity() {
+        Intent intent = ChatActivity.newIntent(getContext());
+        getActivity().startActivity(intent);
     }
 
     private class SplashScreenPagerAdapter extends PagerAdapter {

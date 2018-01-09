@@ -1,50 +1,30 @@
-package com.aadamsdev.communities;
+package com.aadamsdev.communities.activities;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.fragments.SplashFragment;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 
-import java.util.HashMap;
+public class SplashActivity extends AppCompatActivity {
 
-import io.socket.client.Socket;
-
-public class MainActivity extends AppCompatActivity {
-
-    private FragmentTransaction fragmentTransaction;
     private SplashFragment splashFragment;
-    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        context = this;
+        setContentView(R.layout.activity_container);
 
         loadPermissions(Manifest.permission.ACCESS_FINE_LOCATION, 0);
 
-        splashFragment = new SplashFragment();
-
-        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.activity_main, splashFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        splashFragment = SplashFragment.newFragment();
+        launchFragment(splashFragment);
     }
 
     private void loadPermissions(String perm, int requestCode) {
@@ -71,6 +51,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void launchFragment(SplashFragment splashFragment) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.activity_main, splashFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 }
 

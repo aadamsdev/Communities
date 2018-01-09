@@ -5,6 +5,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.aadamsdev.communities.MainActivity">
+    tools:context="com.aadamsdev.communities.activities.SplashActivity">
 
 </RelativeLayout>
