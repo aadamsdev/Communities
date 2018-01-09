@@ -4,36 +4,37 @@ package com.aadamsdev.communities.fragments;
  * Created by Andrew Adams on 6/18/2017.
  */
 
-import com.aadamsdev.communities.chat.ChatArrayAdapter;
-import com.aadamsdev.communities.chat.ChatClient;
-import com.aadamsdev.communities.chat.ChatMessage;
-import com.aadamsdev.communities.R;
-import com.aadamsdev.communities.utils.PreferenceManager;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.DataSetObserver;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.aadamsdev.communities.R;
+import com.aadamsdev.communities.chat.ChatAdapter;
+import com.aadamsdev.communities.chat.ChatClient;
+import com.aadamsdev.communities.chat.ChatMessage;
+import com.aadamsdev.communities.utils.PreferenceManager;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
 
@@ -43,21 +44,25 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     private PreferenceManager preferenceManager;
     private View view;
 
-    private ChatArrayAdapter chatArrayAdapter;
-
-    private ListView chatListView;
-
-    private EditText messageEditText;
-    private ImageButton sendMessageButton;
+    private ChatAdapter chatAdapter;
 
     private String[] menuItems;
+
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
-
     private ChatClient chatClient;
 
     private String currentUsername = null;
+
+    @BindView(R.id.chat_recycler_view)
+    RecyclerView chatRecyclerView;
+
+    @BindView(R.id.message_field)
+    EditText messageEditText;
+
+    @BindView(R.id.send_button)
+    ImageButton sendMessageButton;
 
     public static ChatFragment newFragment() {
         return new ChatFragment();
@@ -67,46 +72,33 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            getActivity().getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            Toast.makeText(getContext(), "Hiding action bar...", Toast.LENGTH_SHORT).show();
-        }
+        showActionBar();
+        setSystemUiVisiblity();
+        initChatClient();
 
         preferenceManager = PreferenceManager.getInstance(getContext());
-
-        chatClient = ChatClient.getInstance(getContext());
-        chatClient.connect();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.main_fragment, container, false);
+        view = inflater.inflate(R.layout.chat_fragment, container, false);
+        ButterKnife.bind(this, view);
+//        setupDrawerSlider(view);
+        chatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        setupDrawerSlider(view);
-
-        chatListView = (ListView) view.findViewById(R.id.chat_scrollview);
-        chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-
-        chatArrayAdapter = new ChatArrayAdapter(getContext());
-        chatListView.setAdapter(chatArrayAdapter);
+        chatAdapter = new ChatAdapter(getContext());
+        chatRecyclerView.setAdapter(chatAdapter);
 
         //to scroll the list view to bottom on data change
-        chatArrayAdapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                chatListView.setSelection(chatArrayAdapter.getCount() - 1);
-            }
-        });
+//        chatArrayAdapter.registerDataSetObserver(new DataSetObserver() {
+//            @Override
+//            public void onChanged() {
+//                super.onChanged();
+//                chatListView.setSelection(chatArrayAdapter.getCount() - 1);
+//            }
+//        });
 
-        sendMessageButton = (ImageButton) view.findViewById(R.id.send_button);
         sendMessageButton.setOnClickListener(this);
 
-        messageEditText = (EditText) view.findViewById(R.id.message_field);
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -138,11 +130,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         ChatMessage chatMessage = new ChatMessage(getContext(), username, message + " " + count, timestamp, null);
         ++count;
 
-        chatArrayAdapter.add(chatMessage);
+        chatAdapter.add(chatMessage);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                chatArrayAdapter.notifyDataSetChanged();
+                chatAdapter.notifyItemInserted(chatAdapter.getItemCount() - 1);
             }
         });
     }
@@ -156,12 +148,34 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         }
     }
 
+    private void initChatClient() {
+        chatClient = ChatClient.getInstance(getContext());
+        chatClient.connect();
+    }
+
     private void sendMessage() {
         String message = messageEditText.getText().toString();
         messageEditText.getText().clear();
 
         currentUsername = preferenceManager.getCurrentUser();
         chatClient.sendMessage(currentUsername, message);
+    }
+
+    private void showActionBar() {
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.show();
+        }
+    }
+
+    private void setSystemUiVisiblity() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            getActivity().getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            Toast.makeText(getContext(), "Hiding action bar...", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setupDrawerSlider(View view) {
@@ -210,6 +224,5 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             }
         });
     }
-
 
 }
