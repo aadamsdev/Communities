@@ -4,8 +4,13 @@ package com.aadamsdev.communities.fragments;
  * Created by Andrew Adams on 6/18/2017.
  */
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -16,12 +21,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -31,6 +33,7 @@ import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.chat.ChatAdapter;
 import com.aadamsdev.communities.chat.ChatClient;
 import com.aadamsdev.communities.chat.ChatMessage;
+import com.aadamsdev.communities.utils.CommunitiesUtils;
 import com.aadamsdev.communities.utils.PreferenceManager;
 
 import butterknife.BindView;
@@ -41,19 +44,19 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     private final String TAG = ChatFragment.class.getSimpleName();
     int count = 0;
 
-    private PreferenceManager preferenceManager;
-    private View view;
+    private final int LOCATION_PERMISSION = 100;
 
-    private ChatAdapter chatAdapter;
+    private PreferenceManager preferenceManager;
 
     private String[] menuItems;
-
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
+
     private ChatClient chatClient;
+    private ChatAdapter chatAdapter;
 
     private String currentUsername = null;
+
+    private LocationManager locationManager;
 
     @BindView(R.id.chat_recycler_view)
     RecyclerView chatRecyclerView;
@@ -63,6 +66,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     @BindView(R.id.send_button)
     ImageButton sendMessageButton;
+
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
 
     public static ChatFragment newFragment() {
         return new ChatFragment();
@@ -75,27 +81,23 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         showActionBar();
         setSystemUiVisiblity();
         initChatClient();
+        requestPermission();
 
         preferenceManager = PreferenceManager.getInstance(getContext());
+
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        chatAdapter = new ChatAdapter();
+        chatClient.registerCallback(this);
+        chatClient.startLocationRequests(locationManager);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.chat_fragment, container, false);
+        View view = inflater.inflate(R.layout.chat_fragment, container, false);
         ButterKnife.bind(this, view);
 //        setupDrawerSlider(view);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        chatAdapter = new ChatAdapter(getContext());
         chatRecyclerView.setAdapter(chatAdapter);
-
-        //to scroll the list view to bottom on data change
-//        chatArrayAdapter.registerDataSetObserver(new DataSetObserver() {
-//            @Override
-//            public void onChanged() {
-//                super.onChanged();
-//                chatListView.setSelection(chatArrayAdapter.getCount() - 1);
-//            }
-//        });
 
         sendMessageButton.setOnClickListener(this);
 
@@ -120,9 +122,24 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             }
         });
 
-        chatClient.registerCallback(this);
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (CommunitiesUtils.checkLocationPermissions(getContext())) {
+            try {
+                ChatClient.getInstance().updateLocation(locationManager);
+            } catch (SecurityException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -134,9 +151,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                chatAdapter.notifyItemInserted(chatAdapter.getItemCount() - 1);
+                chatAdapter.notifyItemInserted(chatAdapter.getItemCount());
             }
         });
+    }
+
+    @Override
+    public void onChatRoomChanged(String chatRoomName) {
+        Toast.makeText(getContext(), chatRoomName, Toast.LENGTH_SHORT).show();
+        PreferenceManager.getInstance(getContext()).setLastKnownChatRoom(chatRoomName);
     }
 
     @Override
@@ -148,8 +171,16 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+        }
+    }
+
     private void initChatClient() {
-        chatClient = ChatClient.getInstance(getContext());
+        chatClient = ChatClient.getInstance();
         chatClient.connect();
     }
 
@@ -178,51 +209,58 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         }
     }
 
-    private void setupDrawerSlider(View view) {
-        menuItems = getResources().getStringArray(R.array.menu_items);
-        drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
-        drawerList = (ListView) view.findViewById(R.id.left_drawer);
-
-        drawerToggle = new ActionBarDrawerToggle(
-                getActivity(),                  /* host Activity */
-                drawerLayout,         /* DrawerLayout object */
-                R.string.drawer_open,  /* "open drawer" description */
-                R.string.drawer_close  /* "close drawer" description */
-        ) {
-
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                Log.i("ChatFragment", "Drawer closed");
-            }
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                Log.i("ChatFragment", "Drawer open");
-            }
-        };
-
-        // Set the drawer toggle as the DrawerListener
-        drawerLayout.addDrawerListener(drawerToggle);
-
-        try {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-        } catch (NullPointerException ex) {
-            Log.i("ChatFragment", ex.toString());
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION);
         }
-
-        // Set the adapter for the list view
-        drawerList.setAdapter(new ArrayAdapter<>(getContext(), R.layout.drawer_list_item, menuItems));
-        // Set the list's click listener
-        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
     }
+
+    //    private void setupDrawerSlider(View view) {
+//        menuItems = getResources().getStringArray(R.array.menu_items);
+//        drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
+//        drawerList = (ListView) view.findViewById(R.id.left_drawer);
+//
+//        drawerToggle = new ActionBarDrawerToggle(
+//                getActivity(),                  /* host Activity */
+//                drawerLayout,         /* DrawerLayout object */
+//                R.string.drawer_open,  /* "open drawer" description */
+//                R.string.drawer_close  /* "close drawer" description */
+//        ) {
+//
+//            /** Called when a drawer has settled in a completely closed state. */
+//            public void onDrawerClosed(View view) {
+//                super.onDrawerClosed(view);
+//                Log.i("ChatFragment", "Drawer closed");
+//            }
+//
+//            /** Called when a drawer has settled in a completely open state. */
+//            public void onDrawerOpened(View drawerView) {
+//                super.onDrawerOpened(drawerView);
+//                Log.i("ChatFragment", "Drawer open");
+//            }
+//        };
+//
+//        // Set the drawer toggle as the DrawerListener
+//        drawerLayout.addDrawerListener(drawerToggle);
+//
+//        try {
+//            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//            ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+//            ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+//        } catch (NullPointerException ex) {
+//            Log.i("ChatFragment", ex.toString());
+//        }
+//
+//        // Set the adapter for the list view
+//        drawerList.setAdapter(new ArrayAdapter<>(getContext(), R.layout.drawer_list_item, menuItems));
+//        // Set the list's click listener
+//        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//            }
+//        });
+//    }
+
 
 }

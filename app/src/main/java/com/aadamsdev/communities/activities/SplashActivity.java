@@ -55,8 +55,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void launchFragment(SplashFragment splashFragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.activity_main, splashFragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.activity_main, splashFragment);
         fragmentTransaction.commit();
     }
 }

@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginEnd="8dp"
+        android:textSize="16sp"
         android:textStyle="bold"
         tools:text="UserName" />
 
@@ -20,9 +21,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@id/username"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_toEndOf="@+id/username"
-        android:layout_marginStart="8dp"
+        android:textSize="16sp"
         tools:text="@string/test_message" />
 
     <TextView
@@ -30,6 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/username"
+        android:textSize="16sp"
         tools:text="6:23 PM" />
 
 </RelativeLayout>

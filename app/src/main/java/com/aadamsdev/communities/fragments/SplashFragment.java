@@ -65,11 +65,11 @@ public class SplashFragment extends Fragment {
         // Checking for first time launch - before calling setContentView()
         preferenceManager = PreferenceManager.getInstance(getContext());
         //TODO: Remove comment to skip splash screen
-//        if (!preferenceManager.isFirstTimeLaunch()) {
-//            launchChatFragment();
-//        } else {
-//            preferenceManager.setFirstTimeLaunch(false);
-//        }
+        if (!preferenceManager.isFirstTimeLaunch()) {
+            launchChatActivity();
+        } else {
+            preferenceManager.setFirstTimeLaunch(false);
+        }
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

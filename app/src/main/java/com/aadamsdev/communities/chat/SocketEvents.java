@@ -7,4 +7,5 @@ package com.aadamsdev.communities.chat;
 public class SocketEvents {
     public final static String NEW_CLIENT = "newClient";
     public final static String MESSAGE = "message";
+    public final static String LOCATION_CHANGED = "location_changed";
 }

@@ -34,8 +34,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void launchFragment(ChatFragment chatFragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.activity_main, chatFragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.activity_main, chatFragment);
         fragmentTransaction.commit();
     }
 }

@@ -27,14 +27,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     private Context context;
 
-    public ChatAdapter(Context context) {
-        this.context = context;
+    public ChatAdapter() {
         messages = new ArrayList<>();
+        setHasStableIds(true);
     }
 
-    public ChatAdapter(Context context, List<ChatMessage> messages) {
-        this.context = context;
+    public ChatAdapter(List<ChatMessage> messages) {
         this.messages = messages;
+        setHasStableIds(true);
     }
 
     public void add(ChatMessage object) {

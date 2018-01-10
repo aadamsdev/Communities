@@ -12,20 +12,18 @@ import com.aadamsdev.communities.chat.ChatClient;
 
 public class PreferenceManager {
     private static SharedPreferences sharedPreferences;
-    private static Context context;
-
     private static PreferenceManager instance;
 
     // shared pref mode
-    int PRIVATE_MODE = 0;
+    private int PRIVATE_MODE = 0;
 
     // Shared preferences file name
     private static final String PREF_NAME = "communities";
-    private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
-    private static final String USER_NAME = "COMMUNITIES_USERNAME_KEY";
+    private static final String IS_FIRST_TIME_LAUNCH = "is_first_launch";
+    private static final String USER_NAME = "username_key";
+    private static final String LAST_CHAT_ROOM = "last_chat_room";
 
     private PreferenceManager(Context context) {
-        this.context = context;
         sharedPreferences = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
     }
 
@@ -56,5 +54,13 @@ public class PreferenceManager {
         return sharedPreferences.getString(USER_NAME, "");
     }
 
+    public void setLastKnownChatRoom(String chatRoomName) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(LAST_CHAT_ROOM, chatRoomName);
+        editor.apply();
+    }
 
+    public String getLastChatRoom() {
+        return sharedPreferences.getString(LAST_CHAT_ROOM, "");
+    }
 }

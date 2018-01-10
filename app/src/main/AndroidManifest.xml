@@ -16,7 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activities.SplashActivity">
+        <activity
+            android:name=".activities.SplashActivity"
+            android:noHistory="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,8 +27,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.ChatActivity">
-        </activity>
+        <activity android:name=".activities.ChatActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
