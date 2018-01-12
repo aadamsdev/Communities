@@ -32,7 +32,8 @@ import android.widget.Toast;
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.chat.ChatAdapter;
 import com.aadamsdev.communities.chat.ChatClient;
-import com.aadamsdev.communities.chat.ChatMessage;
+import com.aadamsdev.communities.pojo.ChatMessage;
+import com.aadamsdev.communities.pojo.ChatRoom;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
 import com.aadamsdev.communities.utils.PreferenceManager;
 
@@ -95,7 +96,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.chat_fragment, container, false);
         ButterKnife.bind(this, view);
-//        setupDrawerSlider(view);
+
+        // setupDrawerSlider(view);
+
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         chatRecyclerView.setAdapter(chatAdapter);
 
@@ -143,8 +146,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     @Override
-    public void onNewMessage(String username, String message, String timestamp, int userIconId) {
-        ChatMessage chatMessage = new ChatMessage(getContext(), username, message + " " + count, timestamp, null);
+    public void onNewMessage(ChatMessage chatMessage) {
+//        ChatMessage chatMessage = new ChatMessage(getContext(), username, message + " " + count, timestamp, null);
         ++count;
 
         chatAdapter.add(chatMessage);
@@ -157,9 +160,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     @Override
-    public void onChatRoomChanged(String chatRoomName) {
-        Toast.makeText(getContext(), chatRoomName, Toast.LENGTH_SHORT).show();
-        PreferenceManager.getInstance(getContext()).setLastKnownChatRoom(chatRoomName);
+    public void onChatRoomChanged(final ChatRoom chatRoom) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext(), chatRoom.getChatroomName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        PreferenceManager.getInstance(getContext()).setLastKnownChatRoom(chatRoom);
     }
 
     @Override

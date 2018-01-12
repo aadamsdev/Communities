@@ -9,8 +9,11 @@ import android.content.SharedPreferences;
 
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.chat.ChatClient;
+import com.aadamsdev.communities.pojo.ChatRoom;
+import com.google.gson.Gson;
 
 public class PreferenceManager {
+    private static Gson gson;
     private static SharedPreferences sharedPreferences;
     private static PreferenceManager instance;
 
@@ -25,6 +28,7 @@ public class PreferenceManager {
 
     private PreferenceManager(Context context) {
         sharedPreferences = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
+        gson = new Gson();
     }
 
     public static PreferenceManager getInstance(Context context) {
@@ -54,13 +58,15 @@ public class PreferenceManager {
         return sharedPreferences.getString(USER_NAME, "");
     }
 
-    public void setLastKnownChatRoom(String chatRoomName) {
+    public void setLastKnownChatRoom(ChatRoom chatRoom) {
+        String chatRoomJson = gson.toJson(chatRoom);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(LAST_CHAT_ROOM, chatRoomName);
+        editor.putString(LAST_CHAT_ROOM, chatRoomJson);
         editor.apply();
     }
 
-    public String getLastChatRoom() {
-        return sharedPreferences.getString(LAST_CHAT_ROOM, "");
+    public ChatRoom getLastChatRoom() {
+        String chatRoomJson = sharedPreferences.getString(LAST_CHAT_ROOM, "");
+        return gson.fromJson(chatRoomJson, ChatRoom.class);
     }
 }

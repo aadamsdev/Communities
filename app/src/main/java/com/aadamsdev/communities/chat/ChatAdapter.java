@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.aadamsdev.communities.R;
+import com.aadamsdev.communities.pojo.ChatMessage;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,25 +1,15 @@
 package com.aadamsdev.communities.chat;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.aadamsdev.communities.pojo.ChatMessage;
+import com.aadamsdev.communities.pojo.ChatRoom;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,12 +32,9 @@ public class ChatClient implements android.location.LocationListener {
     //    //Define a request code to send to Google Play services
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
-    private GoogleApiClient googleApiClient;
-    private LocationRequest locationRequest;
-    private double currentLatitude;
-    private double currentLongitude;
-
     private static ChatClient client;
+    private static Gson gson;
+    private static String currentChatRoom;
 
     private Socket socket;
     private ChatClientCallback chatClientCallback;
@@ -65,6 +52,7 @@ public class ChatClient implements android.location.LocationListener {
     public static ChatClient getInstance() {
         if (client == null) {
             client = new ChatClient();
+            gson = new Gson();
         }
         return client;
     }
@@ -88,14 +76,10 @@ public class ChatClient implements android.location.LocationListener {
             @Override
             public void call(Object... args) {
                 JSONObject data = (JSONObject) args[0];
+                String dataStr = data.toString();
 
-                try {
-                    String chatRoomName = data.getString("chatRoomName");
-
-                    chatClientCallback.onChatRoomChanged(chatRoomName);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                ChatRoom chatRoom = gson.fromJson(dataStr, ChatRoom.class);
+                chatClientCallback.onChatRoomChanged(chatRoom);
             }
 
         }).on(INCOMING_MESSAGE, new Emitter.Listener() {
@@ -103,17 +87,10 @@ public class ChatClient implements android.location.LocationListener {
             public void call(final Object... args) {
                 if (chatClientCallback != null) {
                     JSONObject data = (JSONObject) args[0];
+                    String dataStr = data.toString();
 
-                    try {
-                        String username = data.getString("username");
-                        String message = data.getString("message");
-                        String timestamp = data.getString("timestamp");
-                        int userIconId = data.getInt("userIconId");
-
-                        chatClientCallback.onNewMessage(username, message, timestamp, userIconId);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    ChatMessage chatMessage = gson.fromJson(dataStr, ChatMessage.class);
+                    chatClientCallback.onNewMessage(chatMessage);
                 }
             }
 
@@ -132,7 +109,6 @@ public class ChatClient implements android.location.LocationListener {
         try {
             object.put("username", username);
             object.put("message", message);
-            object.put("userIconId", 0);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -145,14 +121,16 @@ public class ChatClient implements android.location.LocationListener {
         Log.i(TAG, location.getLatitude() + " " + location.getLongitude());
 
         //If everything went fine lets get latitude and longitude
-        currentLatitude = location.getLatitude();
-        currentLongitude = location.getLongitude();
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+//        String chatroom = PreferenceManager.getInstance()
 
         JSONObject coordinates = new JSONObject();
 
         try {
             coordinates.put("latitude", currentLatitude);
             coordinates.put("longitude", currentLongitude);
+//            coordinates.put("chatroom", )
 
             socket.connect();
             socket.emit(LOCATION_UPDATE, coordinates);
@@ -198,9 +176,9 @@ public class ChatClient implements android.location.LocationListener {
     }
 
     public interface ChatClientCallback {
-        void onNewMessage(String username, String message, String timestamp, int userIconId);
+        void onNewMessage(ChatMessage chatMessage);
 
-        void onChatRoomChanged(String chatRoomName);
+        void onChatRoomChanged(ChatRoom chatRoom);
     }
 }
 

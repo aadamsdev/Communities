@@ -1,4 +1,4 @@
-package com.aadamsdev.communities.chat;
+package com.aadamsdev.communities.pojo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,30 +17,14 @@ import org.w3c.dom.Text;
 
 public class ChatMessage {
 
-    private ImageView iconImageView;
-    private TextView messageTextView;
-    private TextView usernameTextView;
-    private TextView timestampTextView;
-
-    private Bitmap userIcon;
     private String message;
     private String username;
     private String timestamp;
 
-    public ChatMessage(Context context, String username, String message, String timestamp, Bitmap userIcon) {
-        this.userIcon = userIcon;
+    public ChatMessage(String username, String message, String timestamp) {
         this.message = message;
         this.username = username;
         this.timestamp = timestamp;
-    }
-
-    public Bitmap getUserIcon() {
-        return userIcon;
-    }
-
-    public void setUserIcon(Bitmap userIcon) {
-        this.userIcon = userIcon;
-        iconImageView.setImageBitmap(userIcon);
     }
 
     public String getMessage() {
@@ -49,7 +33,6 @@ public class ChatMessage {
 
     public void setMessage(String message) {
         this.message = message;
-        messageTextView.setText(message.toCharArray(), 0, message.length());
     }
 
     public String getUsername() {
@@ -58,7 +41,6 @@ public class ChatMessage {
 
     public void setUsername(String username) {
         this.username = username;
-        usernameTextView.setText(username.toCharArray(), 0, username.length());
     }
 
     public String getTimestamp() {
@@ -67,6 +49,5 @@ public class ChatMessage {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
-        timestampTextView.setText(timestamp.toCharArray(), 0, timestamp.length());
     }
 }
