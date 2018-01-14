@@ -32,9 +32,11 @@ import android.widget.Toast;
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.chat.ChatAdapter;
 import com.aadamsdev.communities.chat.ChatClient;
+import com.aadamsdev.communities.dialogs.SimpleDialogFragment;
 import com.aadamsdev.communities.pojo.ChatMessage;
 import com.aadamsdev.communities.pojo.ChatRoom;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
+import com.aadamsdev.communities.utils.DialogUtils;
 import com.aadamsdev.communities.utils.PreferenceManager;
 
 import butterknife.BindView;
@@ -43,9 +45,10 @@ import butterknife.ButterKnife;
 public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
 
     private final String TAG = ChatFragment.class.getSimpleName();
-    int count = 0;
 
     private final int LOCATION_PERMISSION = 100;
+
+    private final String CHATROOM_CHANGED_DIALOG = "ChatRoomChangedDialog";
 
     private PreferenceManager preferenceManager;
 
@@ -54,8 +57,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     private ChatClient chatClient;
     private ChatAdapter chatAdapter;
-
-    private String currentUsername = null;
 
     private LocationManager locationManager;
 
@@ -84,7 +85,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         initChatClient();
         requestPermission();
 
-        preferenceManager = PreferenceManager.getInstance(getContext());
+        preferenceManager = PreferenceManager.getInstance(getActivity());
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -131,6 +132,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     @Override
     public void onResume() {
         super.onResume();
+
+        //TODO Add dialog and wait for callback before showing current chatrooom
         if (CommunitiesUtils.checkLocationPermissions(getContext())) {
             try {
                 ChatClient.getInstance().updateLocation(locationManager);
@@ -147,9 +150,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     @Override
     public void onNewMessage(ChatMessage chatMessage) {
-//        ChatMessage chatMessage = new ChatMessage(getContext(), username, message + " " + count, timestamp, null);
-        ++count;
-
         chatAdapter.add(chatMessage);
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -168,7 +168,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             }
         });
 
-        PreferenceManager.getInstance(getContext()).setLastKnownChatRoom(chatRoom);
+        PreferenceManager.getInstance(getActivity()).setLastKnownChatRoom(chatRoom);
+        showChatRoomChangedDialog(chatRoom);
+        updateTitleWithChatRoomName(chatRoom);
     }
 
     @Override
@@ -197,8 +199,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         String message = messageEditText.getText().toString();
         messageEditText.getText().clear();
 
-        currentUsername = preferenceManager.getCurrentUser();
-        chatClient.sendMessage(currentUsername, message);
+        String currentUsername = preferenceManager.getCurrentUser();
+        String currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom().getChatroomName();
+
+        chatClient.sendMessage(currentUsername, message, currentChatRoom);
     }
 
     private void showActionBar() {
@@ -221,6 +225,26 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION);
+        }
+    }
+
+    private void showChatRoomChangedDialog(ChatRoom chatRoom) {
+        String title = getString(R.string.chat_room_change, chatRoom.getChatroomName());
+        String message = getString(R.string.chat_room_change_message, chatRoom.getChatroomName());
+
+        SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(title, message);
+        DialogUtils.show(this, dialogFragment, CHATROOM_CHANGED_DIALOG);
+    }
+
+    private void updateTitleWithChatRoomName(final ChatRoom chatRoom) {
+        final ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (supportActionBar != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    supportActionBar.setTitle(chatRoom.getChatroomName());
+                }
+            });
         }
     }
 
@@ -270,6 +294,4 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 //            }
 //        });
 //    }
-
-
 }

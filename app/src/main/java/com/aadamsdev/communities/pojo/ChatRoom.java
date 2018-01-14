@@ -1,36 +1,22 @@
 package com.aadamsdev.communities.pojo;
 
-import android.graphics.PointF;
-
-import java.util.List;
-
 /**
  * Created by Andrew Adams on 1/11/2018.
  */
 
 public class ChatRoom {
 
-    private String chatroomName;
-    private List<PointF> boundaryPoints;
+    private String chatRoomName;
 
-    public ChatRoom(String chatroomName, List<PointF> boundaryPoints) {
-        this.chatroomName = chatroomName;
-        this.boundaryPoints = boundaryPoints;
+    public ChatRoom(String chatRoomName) {
+        this.chatRoomName = chatRoomName;
     }
 
     public String getChatroomName() {
-        return chatroomName;
+        return chatRoomName;
     }
 
     public void setChatroomName(String chatroomName) {
-        this.chatroomName = chatroomName;
-    }
-
-    public List<PointF> getBoundaryPoints() {
-        return boundaryPoints;
-    }
-
-    public void setBoundaryPoints(List<PointF> boundaryPoints) {
-        this.boundaryPoints = boundaryPoints;
+        this.chatRoomName = chatroomName;
     }
 }

@@ -13,9 +13,11 @@ import com.aadamsdev.communities.pojo.ChatRoom;
 import com.google.gson.Gson;
 
 public class PreferenceManager {
-    private static Gson gson;
-    private static SharedPreferences sharedPreferences;
+
     private static PreferenceManager instance;
+
+    private SharedPreferences sharedPreferences;
+    private Gson gson;
 
     // shared pref mode
     private int PRIVATE_MODE = 0;
