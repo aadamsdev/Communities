@@ -43,7 +43,7 @@ public class ChatClient implements android.location.LocationListener {
     private Socket socket;
     private ChatClientCallback chatClientCallback;
 
-    private final static String HOST_URL = "http://192.168.1.5:3000/";
+    private final static String HOST_URL = "http://192.168.0.10:3000/";
 
     private final static String OUTGOING_MESSAGE = "OUTGOING_MESSAGE";
     private final static String INCOMING_MESSAGE = "INCOMING_MESSAGE";
@@ -125,23 +125,25 @@ public class ChatClient implements android.location.LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, location.getLatitude() + " " + location.getLongitude());
+        if (location != null) {
+            Log.i(TAG, location.getLatitude() + " " + location.getLongitude());
 
-        //If everything went fine lets get latitude and longitude
-        double currentLatitude = location.getLatitude();
-        double currentLongitude = location.getLongitude();
+            //If everything went fine lets get latitude and longitude
+            double currentLatitude = location.getLatitude();
+            double currentLongitude = location.getLongitude();
 
-        JSONObject coordinates = new JSONObject();
+            JSONObject coordinates = new JSONObject();
 
-        try {
-            coordinates.put("latitude", currentLatitude);
-            coordinates.put("longitude", currentLongitude);
-            coordinates.put("lastKnownChatRoom", lastKnownChatRoom);
+            try {
+                coordinates.put("latitude", currentLatitude);
+                coordinates.put("longitude", currentLongitude);
+                coordinates.put("lastKnownChatRoom", lastKnownChatRoom);
 
-            socket.connect();
-            socket.emit(LOCATION_UPDATE, coordinates);
-        } catch (JSONException e) {
-            e.printStackTrace();
+                socket.connect();
+                socket.emit(LOCATION_UPDATE, coordinates);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -25,8 +25,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private final String TAG = ChatAdapter.class.getSimpleName();
 
     private List<ChatMessage> messages;
-
-    private Context context;
+    private OnBottomReachedListener onBottomReachedListener;
 
     public ChatAdapter() {
         messages = new ArrayList<>();
@@ -56,6 +55,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         holder.timestampField.setText(message.getTimestamp());
         holder.usernameField.setText(message.getUsername());
         holder.messageField.setText(message.getMessage());
+
+        if (onBottomReachedListener != null && position == messages.size() - 1) {
+            onBottomReachedListener.onBottomReached(position);
+        }
     }
 
     @Override
@@ -68,8 +71,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         return messages.size();
     }
 
+    public void setOnBottomReachedListener(OnBottomReachedListener onBottomReachedListener) {
+        this.onBottomReachedListener = onBottomReachedListener;
+    }
 
-    public class ChatViewHolder extends RecyclerView.ViewHolder {
+    class ChatViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.message)
         TextView messageField;
@@ -80,10 +86,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         @BindView(R.id.timestamp)
         TextView timestampField;
 
-        public ChatViewHolder(View v) {
+        ChatViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
         }
     }
 
+    public interface OnBottomReachedListener {
+        void onBottomReached(int position);
+    }
 }

@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,7 @@ import com.aadamsdev.communities.utils.PreferenceManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
+public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback, ChatAdapter.OnBottomReachedListener {
 
     private final String TAG = ChatFragment.class.getSimpleName();
 
@@ -90,6 +91,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         chatAdapter = new ChatAdapter();
+//        chatAdapter.setOnBottomReachedListener(this);
+
         chatClient.registerCallback(this);
         chatClient.startLocationRequests(locationManager);
     }
@@ -151,12 +154,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     @Override
     public void onNewMessage(ChatMessage chatMessage) {
         chatAdapter.add(chatMessage);
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                chatAdapter.notifyItemInserted(chatAdapter.getItemCount());
-            }
-        });
+        scrollToBottomOfChat();
     }
 
     @Override
@@ -183,6 +181,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     @Override
+    public void onBottomReached(int position) {
+
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -200,9 +203,18 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         messageEditText.getText().clear();
 
         String currentUsername = preferenceManager.getCurrentUser();
-        String currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom().getChatroomName();
 
-        chatClient.sendMessage(currentUsername, message, currentChatRoom);
+        for (int i = 0; i < 10; i++) {
+            message += " " + i;
+
+            ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
+            if (currentChatRoom != null) {
+                String currentChatRoomName = PreferenceManager.getInstance(getActivity()).getLastChatRoom().getChatroomName();
+                chatClient.sendMessage(currentUsername, message, currentChatRoomName);
+            } else {
+                chatClient.sendMessage(currentUsername, message, null);
+            }
+        }
     }
 
     private void showActionBar() {
@@ -247,6 +259,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             });
         }
     }
+
+    private void scrollToBottomOfChat() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                chatRecyclerView.scrollToPosition(chatAdapter.getItemCount() - 1);
+            }
+        });
+    }
+
+
 
     //    private void setupDrawerSlider(View view) {
 //        menuItems = getResources().getStringArray(R.array.menu_items);
