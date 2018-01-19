@@ -1,5 +1,7 @@
 package com.aadamsdev.communities.pojo;
 
+import java.util.List;
+
 /**
  * Created by Andrew Adams on 1/11/2018.
  */
@@ -7,16 +9,26 @@ package com.aadamsdev.communities.pojo;
 public class ChatRoom {
 
     private String chatRoomName;
+    private List<ChatMessage> messages;
 
-    public ChatRoom(String chatRoomName) {
+    public ChatRoom(String chatRoomName, List<ChatMessage> messages) {
         this.chatRoomName = chatRoomName;
+        this.messages = messages;
     }
 
-    public String getChatroomName() {
+    public String getChatRoomName() {
         return chatRoomName;
     }
 
-    public void setChatroomName(String chatroomName) {
-        this.chatRoomName = chatroomName;
+    public void setChatRoomName(String chatRoomName) {
+        this.chatRoomName = chatRoomName;
+    }
+
+    public List<ChatMessage> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<ChatMessage> messages) {
+        this.messages = messages;
     }
 }

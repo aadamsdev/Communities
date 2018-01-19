@@ -51,8 +51,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     private final String CHATROOM_CHANGED_DIALOG = "ChatRoomChangedDialog";
 
-    private PreferenceManager preferenceManager;
-
     private String[] menuItems;
     private ActionBarDrawerToggle drawerToggle;
 
@@ -70,9 +68,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     @BindView(R.id.send_button)
     ImageButton sendMessageButton;
 
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
-
     public static ChatFragment newFragment() {
         return new ChatFragment();
     }
@@ -85,8 +80,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         setSystemUiVisiblity();
         initChatClient();
         requestPermission();
-
-        preferenceManager = PreferenceManager.getInstance(getActivity());
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -158,17 +151,21 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     @Override
-    public void onChatRoomChanged(final ChatRoom chatRoom) {
+    public void onChatRoomChanged(final ChatRoom newChatRoom) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getContext(), chatRoom.getChatroomName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), newChatRoom.getChatRoomName(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        PreferenceManager.getInstance(getActivity()).setLastKnownChatRoom(chatRoom);
-        showChatRoomChangedDialog(chatRoom);
-        updateTitleWithChatRoomName(chatRoom);
+        ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
+        if (currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) {
+            PreferenceManager.getInstance(getActivity()).setLastKnownChatRoom(newChatRoom);
+            showChatRoomChangedDialog(newChatRoom);
+            updateTitleWithChatRoomName(newChatRoom);
+            clearChat();
+        }
     }
 
     @Override
@@ -202,15 +199,14 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         String message = messageEditText.getText().toString();
         messageEditText.getText().clear();
 
-        String currentUsername = preferenceManager.getCurrentUser();
+        String currentUsername = PreferenceManager.getInstance(getActivity()).getCurrentUser();
 
         for (int i = 0; i < 10; i++) {
             message += " " + i;
 
             ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
             if (currentChatRoom != null) {
-                String currentChatRoomName = PreferenceManager.getInstance(getActivity()).getLastChatRoom().getChatroomName();
-                chatClient.sendMessage(currentUsername, message, currentChatRoomName);
+                chatClient.sendMessage(currentUsername, message, currentChatRoom.getChatRoomName());
             } else {
                 chatClient.sendMessage(currentUsername, message, null);
             }
@@ -241,8 +237,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     private void showChatRoomChangedDialog(ChatRoom chatRoom) {
-        String title = getString(R.string.chat_room_change, chatRoom.getChatroomName());
-        String message = getString(R.string.chat_room_change_message, chatRoom.getChatroomName());
+        String title = getString(R.string.chat_room_change, chatRoom.getChatRoomName());
+        String message = getString(R.string.chat_room_change_message, chatRoom.getChatRoomName());
 
         SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(title, message);
         DialogUtils.show(this, dialogFragment, CHATROOM_CHANGED_DIALOG);
@@ -254,7 +250,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    supportActionBar.setTitle(chatRoom.getChatroomName());
+                    supportActionBar.setTitle(chatRoom.getChatRoomName());
                 }
             });
         }
@@ -269,6 +265,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         });
     }
 
+    private void clearChat() {
+        int size = chatAdapter.getItemCount();
+        chatAdapter.getMessages().clear();
+        chatAdapter.notifyItemRangeRemoved(0, size);
+    }
 
 
     //    private void setupDrawerSlider(View view) {

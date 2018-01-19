@@ -71,6 +71,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         return messages.size();
     }
 
+    public List<ChatMessage> getMessages() {
+        return messages;
+    }
+
     public void setOnBottomReachedListener(OnBottomReachedListener onBottomReachedListener) {
         this.onBottomReachedListener = onBottomReachedListener;
     }
