@@ -40,6 +40,8 @@ import com.aadamsdev.communities.utils.CommunitiesUtils;
 import com.aadamsdev.communities.utils.DialogUtils;
 import com.aadamsdev.communities.utils.PreferenceManager;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -159,12 +161,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             }
         });
 
+        updateTitleWithChatRoomName(newChatRoom);
+
         ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
-        if (currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) {
+        if ((currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) || !ChatClient.getInstance().isInChatRoom()) {
+
             PreferenceManager.getInstance(getActivity()).setLastKnownChatRoom(newChatRoom);
             showChatRoomChangedDialog(newChatRoom);
-            updateTitleWithChatRoomName(newChatRoom);
             clearChat();
+            setChatHistory(newChatRoom.getMessages());
         }
     }
 
@@ -271,7 +276,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         chatAdapter.notifyItemRangeRemoved(0, size);
     }
 
-
+    private void setChatHistory(List<ChatMessage> messages) {
+        chatAdapter.getMessages().addAll(messages);
+        chatAdapter.notifyDataSetChanged();
+    }
     //    private void setupDrawerSlider(View view) {
 //        menuItems = getResources().getStringArray(R.array.menu_items);
 //        drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);

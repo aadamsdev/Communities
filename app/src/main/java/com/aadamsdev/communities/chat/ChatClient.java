@@ -39,6 +39,7 @@ public class ChatClient implements android.location.LocationListener {
     private Gson gson;
 
     private String lastKnownChatRoom;
+    private boolean isInChatRoom;
 
     private Socket socket;
     private ChatClientCallback chatClientCallback;
@@ -68,6 +69,7 @@ public class ChatClient implements android.location.LocationListener {
             } else {
                 socket = IO.socket(HOST_URL);
             }
+            isInChatRoom = false;
             registerEvents();
             socket.connect();
         } catch (URISyntaxException ex) {
@@ -83,6 +85,7 @@ public class ChatClient implements android.location.LocationListener {
                 String dataStr = data.toString();
 
                 ChatRoom chatRoom = gson.fromJson(dataStr, ChatRoom.class);
+                isInChatRoom = true;
 
                 lastKnownChatRoom = chatRoom.getChatRoomName();
                 chatClientCallback.onChatRoomChanged(chatRoom);
@@ -176,6 +179,10 @@ public class ChatClient implements android.location.LocationListener {
         } catch (SecurityException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public boolean isInChatRoom() {
+        return isInChatRoom;
     }
 
     public void registerCallback(ChatClientCallback chatClientCallback) {
