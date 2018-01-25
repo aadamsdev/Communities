@@ -11,17 +11,20 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.Date;
+
 /**
  * Created by Andrew Adams on 6/22/2017.
  */
 
 public class ChatMessage {
-
+    private String id;
     private String message;
     private String username;
-    private String timestamp;
+    private Date timestamp;
 
-    public ChatMessage(String username, String message, String timestamp) {
+    public ChatMessage(String id, String username, String message, Date timestamp) {
+        this.id = id;
         this.message = message;
         this.username = username;
         this.timestamp = timestamp;
@@ -43,11 +46,19 @@ public class ChatMessage {
         this.username = username;
     }
 
-    public String getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
