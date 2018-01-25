@@ -4,7 +4,6 @@ package com.aadamsdev.communities.chat;
  * Created by Andrew Adams on 6/24/2017.
  */
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,10 @@ import android.widget.TextView;
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.pojo.ChatMessage;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -24,17 +26,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     private final String TAG = ChatAdapter.class.getSimpleName();
 
+    private DateFormat dateFormat;
     private List<ChatMessage> messages;
-    private OnBottomReachedListener onBottomReachedListener;
 
     public ChatAdapter() {
         messages = new ArrayList<>();
-        setHasStableIds(true);
+        init();
     }
 
     public ChatAdapter(List<ChatMessage> messages) {
         this.messages = messages;
+        init();
+    }
+
+    private void init() {
         setHasStableIds(true);
+        dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
     }
 
     public void add(ChatMessage object) {
@@ -52,13 +59,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public void onBindViewHolder(ChatViewHolder holder, int position) {
         ChatMessage message = messages.get(position);
 
-        holder.timestampField.setText(message.getTimestamp());
+        holder.timestampField.setText(createTimestampText(message.getTimestamp()));
         holder.usernameField.setText(message.getUsername());
         holder.messageField.setText(message.getMessage());
-
-        if (onBottomReachedListener != null && position == messages.size() - 1) {
-            onBottomReachedListener.onBottomReached(position);
-        }
     }
 
     @Override
@@ -71,12 +74,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         return messages.size();
     }
 
-    public List<ChatMessage> getMessages() {
-        return messages;
+    private String createTimestampText(Date date) {
+        return dateFormat.format(date);
     }
 
-    public void setOnBottomReachedListener(OnBottomReachedListener onBottomReachedListener) {
-        this.onBottomReachedListener = onBottomReachedListener;
+    public List<ChatMessage> getMessages() {
+        return messages;
     }
 
     class ChatViewHolder extends RecyclerView.ViewHolder {
@@ -96,7 +99,4 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         }
     }
 
-    public interface OnBottomReachedListener {
-        void onBottomReached(int position);
-    }
 }
