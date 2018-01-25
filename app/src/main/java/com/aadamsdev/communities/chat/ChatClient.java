@@ -85,10 +85,12 @@ public class ChatClient implements android.location.LocationListener {
                 String dataStr = data.toString();
 
                 ChatRoom chatRoom = gson.fromJson(dataStr, ChatRoom.class);
-                isInChatRoom = true;
 
                 lastKnownChatRoom = chatRoom.getChatRoomName();
                 chatClientCallback.onChatRoomChanged(chatRoom);
+
+                // Must be after callback; will not show dialog and retrieve chat history otherwise
+                isInChatRoom = true;
             }
 
         }).on(INCOMING_MESSAGE, new Emitter.Listener() {
