@@ -44,7 +44,7 @@ public class ChatClient implements android.location.LocationListener {
     private Socket socket;
     private ChatClientCallback chatClientCallback;
 
-    private final static String HOST_URL = "http://192.168.0.10:3000/";
+    private final static String HOST_URL = "http://192.168.0.10:8000/";
 
     private final static String OUTGOING_MESSAGE = "outgoing_message";
     private final static String INCOMING_MESSAGE = "incoming_message";
@@ -65,7 +65,7 @@ public class ChatClient implements android.location.LocationListener {
     public void connect() {
         try {
             if (CommunitiesUtils.isEmulator()) {
-                socket = IO.socket("http://10.0.2.2:3000/");
+                socket = IO.socket("http://10.0.2.2:8000/");
             } else {
                 socket = IO.socket(HOST_URL);
             }
