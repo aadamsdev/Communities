@@ -38,11 +38,22 @@ import com.aadamsdev.communities.dialogs.ProgressDialogFragment;
 import com.aadamsdev.communities.dialogs.SimpleDialogFragment;
 import com.aadamsdev.communities.pojo.ChatMessage;
 import com.aadamsdev.communities.pojo.ChatRoom;
+import com.aadamsdev.communities.request.GenericRequest;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
 import com.aadamsdev.communities.utils.DialogUtils;
+import com.aadamsdev.communities.utils.HttpHelper;
 import com.aadamsdev.communities.utils.PreferenceManager;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -181,6 +192,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             showChatRoomChangedDialog(newChatRoom);
             clearChat();
             setChatHistory(newChatRoom.getMessages());
+            scrollToBottomOfChat();
         }
     }
 
@@ -212,16 +224,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
         String currentUsername = PreferenceManager.getInstance(getActivity()).getCurrentUser();
 
-        for (int i = 0; i < 10; i++) {
-            message += " " + i;
-
+        for (int i = 0; i < 10; ++i) {
             ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
             if (currentChatRoom != null) {
-                chatClient.sendMessage(currentUsername, message, currentChatRoom.getChatRoomName());
+                chatClient.sendMessage(currentUsername, message + i, currentChatRoom.getChatRoomName());
             } else {
                 chatClient.sendMessage(currentUsername, message, null);
             }
         }
+
     }
 
     private void showActionBar() {
@@ -295,10 +306,40 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     private void showRetrievingChatDialog() {
         String title = "Test";
-        String message = "Test Message";
+        final String message = "Test Message";
 
-        ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(title);
+        final ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(title);
         DialogUtils.show(this, dialogFragment, CHATROOM_HISTORY_DIALOG);
+
+        ChatMessage firstMessage = chatAdapter.getFirstMessage();
+        ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
+
+        if (currentChatRoom != null && firstMessage != null) {
+            String url;
+            if (CommunitiesUtils.isEmulator()) {
+                url = getString(R.string.host_url_emulator);
+            } else {
+                url = getString(R.string.host_url);
+            }
+
+            url += "/chatHistory/page?chatRoomName=" + currentChatRoom.getChatRoomName() + "&lastMessageInChat=" + firstMessage.getId();
+
+            final GenericRequest<ChatMessage[]> request = new GenericRequest<>(Request.Method.GET, url, new HashMap<String, Object>(), ChatMessage[].class, new Response.Listener<ChatMessage[]>() {
+                @Override
+                public void onResponse(ChatMessage[] response) {
+                    LinkedList<ChatMessage> messages = new LinkedList<>(Arrays.asList(response));
+                    chatAdapter.getMessages().addAll(0, messages);
+                    dialogFragment.dismiss();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialogFragment.dismiss();
+                }
+            });
+
+            HttpHelper.getInstance(getActivity()).getRequestQueue().add(request);
+        }
     }
     //    private void setupDrawerSlider(View view) {
 //        menuItems = getResources().getStringArray(R.array.menu_items);

@@ -17,6 +17,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -30,7 +31,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private List<ChatMessage> messages;
 
     public ChatAdapter() {
-        messages = new ArrayList<>();
+        messages = new LinkedList<>();
         init();
     }
 
@@ -80,6 +81,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     public List<ChatMessage> getMessages() {
         return messages;
+    }
+
+    public ChatMessage getFirstMessage() {
+        if (messages != null && messages.size() > 0) {
+            return messages.get(0);
+        } else {
+            return null;
+        }
     }
 
     class ChatViewHolder extends RecyclerView.ViewHolder {
