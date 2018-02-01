@@ -305,10 +305,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     private void showRetrievingChatDialog() {
-        String title = "Test";
-        final String message = "Test Message";
 
-        final ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(title);
+        final ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(getString(R.string.loading_chat_history));
         DialogUtils.show(this, dialogFragment, CHATROOM_HISTORY_DIALOG);
 
         ChatMessage firstMessage = chatAdapter.getFirstMessage();
@@ -327,14 +325,23 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             final GenericRequest<ChatMessage[]> request = new GenericRequest<>(Request.Method.GET, url, new HashMap<String, Object>(), ChatMessage[].class, new Response.Listener<ChatMessage[]>() {
                 @Override
                 public void onResponse(ChatMessage[] response) {
-                    LinkedList<ChatMessage> messages = new LinkedList<>(Arrays.asList(response));
-                    chatAdapter.getMessages().addAll(0, messages);
+                    if (response.length > 0) {
+                        LinkedList<ChatMessage> messages = new LinkedList<>(Arrays.asList(response));
+                        chatAdapter.getMessages().addAll(0, messages);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                chatAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
                     dialogFragment.dismiss();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     dialogFragment.dismiss();
+                    //TODO Add error dialog for chat history
                 }
             });
 

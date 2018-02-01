@@ -11,7 +11,7 @@
     <string name="host_url">http://192.168.0.10:8000</string>
     <string name="host_url_emulator">http://10.0.2.2:8000</string>
 
-<string-array name="menu_items">
+    <string-array name="menu_items">
         <item>showMap</item>
     </string-array>
 
@@ -34,4 +34,5 @@
     <string name="start">JOIN</string>
 
     <string name="test_message">This is a test message</string>
+    <string name="loading_chat_history">Retrieving chat history</string>
 </resources>
