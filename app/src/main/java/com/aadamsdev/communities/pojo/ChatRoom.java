@@ -1,5 +1,6 @@
 package com.aadamsdev.communities.pojo;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,9 +10,9 @@ import java.util.List;
 public class ChatRoom {
 
     private String chatRoomName;
-    private List<ChatMessage> messages;
+    private LinkedList<ChatMessage> messages;
 
-    public ChatRoom(String chatRoomName, List<ChatMessage> messages) {
+    public ChatRoom(String chatRoomName, LinkedList<ChatMessage> messages) {
         this.chatRoomName = chatRoomName;
         this.messages = messages;
     }
@@ -24,11 +25,11 @@ public class ChatRoom {
         this.chatRoomName = chatRoomName;
     }
 
-    public List<ChatMessage> getMessages() {
+    public LinkedList<ChatMessage> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<ChatMessage> messages) {
+    public void setMessages(LinkedList<ChatMessage> messages) {
         this.messages = messages;
     }
 }

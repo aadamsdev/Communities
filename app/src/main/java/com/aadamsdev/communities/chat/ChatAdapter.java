@@ -28,20 +28,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private final String TAG = ChatAdapter.class.getSimpleName();
 
     private DateFormat dateFormat;
-    private List<ChatMessage> messages;
+    private LinkedList<ChatMessage> messages;
 
     public ChatAdapter() {
         messages = new LinkedList<>();
         init();
     }
 
-    public ChatAdapter(List<ChatMessage> messages) {
+    public ChatAdapter(LinkedList<ChatMessage> messages) {
         this.messages = messages;
         init();
     }
 
     private void init() {
-        setHasStableIds(true);
         dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
     }
 
@@ -79,7 +78,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         return dateFormat.format(date);
     }
 
-    public List<ChatMessage> getMessages() {
+    public LinkedList<ChatMessage> getMessages() {
         return messages;
     }
 

@@ -285,7 +285,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         chatAdapter.notifyItemRangeRemoved(0, size);
     }
 
-    private void setChatHistory(List<ChatMessage> messages) {
+    private void setChatHistory(LinkedList<ChatMessage> messages) {
         chatAdapter.getMessages().addAll(messages);
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -326,12 +326,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
                 @Override
                 public void onResponse(ChatMessage[] response) {
                     if (response.length > 0) {
-                        LinkedList<ChatMessage> messages = new LinkedList<>(Arrays.asList(response));
+                        final LinkedList<ChatMessage> messages = new LinkedList<>(Arrays.asList(response));
                         chatAdapter.getMessages().addAll(0, messages);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                chatAdapter.notifyDataSetChanged();
+                                chatAdapter.notifyItemRangeInserted(0, messages.size());
                             }
                         });
                     }
