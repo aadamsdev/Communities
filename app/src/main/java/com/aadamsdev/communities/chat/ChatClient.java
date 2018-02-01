@@ -39,16 +39,17 @@ public class ChatClient implements android.location.LocationListener {
     private Gson gson;
 
     private String lastKnownChatRoom;
+    private boolean isInChatRoom;
 
     private Socket socket;
     private ChatClientCallback chatClientCallback;
 
-    private final static String HOST_URL = "http://192.168.0.10:3000/";
+    private final static String HOST_URL = "http://192.168.0.10:8000/";
 
-    private final static String OUTGOING_MESSAGE = "OUTGOING_MESSAGE";
-    private final static String INCOMING_MESSAGE = "INCOMING_MESSAGE";
-    private final static String LOCATION_UPDATE = "LOCATION_UPDATE";
-    private final static String CHATROOM_UPDATE = "CHATROOM_UPDATE";
+    private final static String OUTGOING_MESSAGE = "outgoing_message";
+    private final static String INCOMING_MESSAGE = "incoming_message";
+    private final static String LOCATION_UPDATE = "location_update";
+    private final static String CHATROOM_UPDATE = "chatroom_update";
 
     private ChatClient() {
         gson = new Gson();
@@ -64,10 +65,11 @@ public class ChatClient implements android.location.LocationListener {
     public void connect() {
         try {
             if (CommunitiesUtils.isEmulator()) {
-                socket = IO.socket("http://10.0.2.2:3000/");
+                socket = IO.socket("http://10.0.2.2:8000/");
             } else {
                 socket = IO.socket(HOST_URL);
             }
+            isInChatRoom = false;
             registerEvents();
             socket.connect();
         } catch (URISyntaxException ex) {
@@ -84,8 +86,11 @@ public class ChatClient implements android.location.LocationListener {
 
                 ChatRoom chatRoom = gson.fromJson(dataStr, ChatRoom.class);
 
-                lastKnownChatRoom = chatRoom.getChatroomName();
+                lastKnownChatRoom = chatRoom.getChatRoomName();
                 chatClientCallback.onChatRoomChanged(chatRoom);
+
+                // Must be after callback; will not show dialog and retrieve chat history otherwise
+                isInChatRoom = true;
             }
 
         }).on(INCOMING_MESSAGE, new Emitter.Listener() {
@@ -101,11 +106,10 @@ public class ChatClient implements android.location.LocationListener {
             }
 
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-
             @Override
             public void call(Object... args) {
-            }
 
+            }
         });
     }
 
@@ -116,11 +120,11 @@ public class ChatClient implements android.location.LocationListener {
             object.put("username", username);
             object.put("message", message);
             object.put("chatRoomName", chatRoomName);
+
+            socket.emit(OUTGOING_MESSAGE, object);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        socket.emit(OUTGOING_MESSAGE, object);
     }
 
     @Override
@@ -177,6 +181,10 @@ public class ChatClient implements android.location.LocationListener {
         } catch (SecurityException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public boolean isInChatRoom() {
+        return isInChatRoom;
     }
 
     public void registerCallback(ChatClientCallback chatClientCallback) {

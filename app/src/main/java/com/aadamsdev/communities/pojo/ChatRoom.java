@@ -1,5 +1,8 @@
 package com.aadamsdev.communities.pojo;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by Andrew Adams on 1/11/2018.
  */
@@ -7,16 +10,26 @@ package com.aadamsdev.communities.pojo;
 public class ChatRoom {
 
     private String chatRoomName;
+    private LinkedList<ChatMessage> messages;
 
-    public ChatRoom(String chatRoomName) {
+    public ChatRoom(String chatRoomName, LinkedList<ChatMessage> messages) {
         this.chatRoomName = chatRoomName;
+        this.messages = messages;
     }
 
-    public String getChatroomName() {
+    public String getChatRoomName() {
         return chatRoomName;
     }
 
-    public void setChatroomName(String chatroomName) {
-        this.chatRoomName = chatroomName;
+    public void setChatRoomName(String chatRoomName) {
+        this.chatRoomName = chatRoomName;
+    }
+
+    public LinkedList<ChatMessage> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(LinkedList<ChatMessage> messages) {
+        this.messages = messages;
     }
 }

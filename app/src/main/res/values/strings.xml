@@ -1,35 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="app_name">Communities</string>
+
+    <string name="chat_room_change">Welcome to %1$s!</string>
+    <string name="chat_room_change_message">Due to your current location you are now apart of the %1$s chat room.</string>
+
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="drawer_open">Open navigation drawer</string>
+
+    <string name="host_url">http://192.168.0.10:8000</string>
+    <string name="host_url_emulator">http://10.0.2.2:8000</string>
 
     <string-array name="menu_items">
         <item>showMap</item>
     </string-array>
 
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
-
-    <string name="slide_1_title">Welcome to Communities!</string>
-    <string name="slide_1_desc">A location based group chat focusing on Toronto neighborhoods</string>
-
-    <string name="slide_2_title">Enter your name</string>
-    <!--<string name="slide_2_desc">Book movie tickets for your family and friends!</string>-->
-
-    <string name="slide_3_title">Great Discounts</string>
-    <string name="slide_3_desc">Best discounts on every single service we offer!</string>
-
-    <string name="slide_4_title">World Travel</string>
-    <string name="slide_4_desc">Book tickets of any transportation and travel the world!</string>
-
-    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
-    <string name="play_again">Play Again</string>
-
     <string name="next">NEXT</string>
+
+    <string name="play_again">Play Again</string>
+    <string name="play_again_desc">To see the welcome slider again, goto Settings -&gt; apps -&gt; welcome slider -&gt; clear data</string>
+
     <string name="skip">SKIP</string>
+
+    <string name="slide_1_desc">A location based group chat focusing on Toronto neighborhoods</string>
+    <string name="slide_1_title">Welcome to Communities!</string>
+    <string name="slide_2_title">Enter your name</string>
+    <string name="slide_3_desc">Best discounts on every single service we offer!</string>
+    <!--<string name="slide_2_desc">Book movie tickets for your family and friends!</string>-->
+    <string name="slide_3_title">Great Discounts</string>
+    <string name="slide_4_desc">Book tickets of any transportation and travel the world!</string>
+    <string name="slide_4_title">World Travel</string>
+
     <string name="start">JOIN</string>
 
     <string name="test_message">This is a test message</string>
-
-    <string name="chat_room_change">Welcome to %1$s!</string>
-    <string name="chat_room_change_message">Due to your current location you are now apart of the %1$s chat room.</string>
-
+    <string name="loading_chat_history">Retrieving chat history</string>
 </resources>

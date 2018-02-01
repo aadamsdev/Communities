@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -33,26 +34,38 @@ import android.widget.Toast;
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.chat.ChatAdapter;
 import com.aadamsdev.communities.chat.ChatClient;
+import com.aadamsdev.communities.dialogs.ProgressDialogFragment;
 import com.aadamsdev.communities.dialogs.SimpleDialogFragment;
 import com.aadamsdev.communities.pojo.ChatMessage;
 import com.aadamsdev.communities.pojo.ChatRoom;
+import com.aadamsdev.communities.request.GenericRequest;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
 import com.aadamsdev.communities.utils.DialogUtils;
+import com.aadamsdev.communities.utils.HttpHelper;
 import com.aadamsdev.communities.utils.PreferenceManager;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback, ChatAdapter.OnBottomReachedListener {
+public class ChatFragment extends Fragment implements View.OnClickListener, ChatClient.ChatClientCallback {
 
     private final String TAG = ChatFragment.class.getSimpleName();
 
     private final int LOCATION_PERMISSION = 100;
 
     private final String CHATROOM_CHANGED_DIALOG = "ChatRoomChangedDialog";
-
-    private PreferenceManager preferenceManager;
-
+    private final String CHATROOM_HISTORY_DIALOG = "ChatHistoryChangedDialog";
     private String[] menuItems;
     private ActionBarDrawerToggle drawerToggle;
 
@@ -60,6 +73,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     private ChatAdapter chatAdapter;
 
     private LocationManager locationManager;
+
+    @BindView(R.id.swipeRefreshLayout)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.chat_recycler_view)
     RecyclerView chatRecyclerView;
@@ -69,9 +85,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     @BindView(R.id.send_button)
     ImageButton sendMessageButton;
-
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
 
     public static ChatFragment newFragment() {
         return new ChatFragment();
@@ -86,12 +99,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         initChatClient();
         requestPermission();
 
-        preferenceManager = PreferenceManager.getInstance(getActivity());
-
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         chatAdapter = new ChatAdapter();
-//        chatAdapter.setOnBottomReachedListener(this);
 
         chatClient.registerCallback(this);
         chatClient.startLocationRequests(locationManager);
@@ -105,6 +115,14 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         chatRecyclerView.setAdapter(chatAdapter);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                showRetrievingChatDialog();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         sendMessageButton.setOnClickListener(this);
 
@@ -158,17 +176,24 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     @Override
-    public void onChatRoomChanged(final ChatRoom chatRoom) {
+    public void onChatRoomChanged(final ChatRoom newChatRoom) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getContext(), chatRoom.getChatroomName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), newChatRoom.getChatRoomName(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        PreferenceManager.getInstance(getActivity()).setLastKnownChatRoom(chatRoom);
-        showChatRoomChangedDialog(chatRoom);
-        updateTitleWithChatRoomName(chatRoom);
+        updateTitleWithChatRoomName(newChatRoom);
+
+        ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
+        if ((currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) || !ChatClient.getInstance().isInChatRoom()) {
+            PreferenceManager.getInstance(getActivity()).setLastKnownChatRoom(newChatRoom);
+            showChatRoomChangedDialog(newChatRoom);
+            clearChat();
+            setChatHistory(newChatRoom.getMessages());
+            scrollToBottomOfChat();
+        }
     }
 
     @Override
@@ -178,11 +203,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
                 sendMessage();
                 break;
         }
-    }
-
-    @Override
-    public void onBottomReached(int position) {
-
     }
 
     @Override
@@ -202,19 +222,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         String message = messageEditText.getText().toString();
         messageEditText.getText().clear();
 
-        String currentUsername = preferenceManager.getCurrentUser();
+        String currentUsername = PreferenceManager.getInstance(getActivity()).getCurrentUser();
 
-        for (int i = 0; i < 10; i++) {
-            message += " " + i;
-
+        for (int i = 0; i < 10; ++i) {
             ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
             if (currentChatRoom != null) {
-                String currentChatRoomName = PreferenceManager.getInstance(getActivity()).getLastChatRoom().getChatroomName();
-                chatClient.sendMessage(currentUsername, message, currentChatRoomName);
+                chatClient.sendMessage(currentUsername, message + i, currentChatRoom.getChatRoomName());
             } else {
                 chatClient.sendMessage(currentUsername, message, null);
             }
         }
+
     }
 
     private void showActionBar() {
@@ -240,21 +258,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         }
     }
 
-    private void showChatRoomChangedDialog(ChatRoom chatRoom) {
-        String title = getString(R.string.chat_room_change, chatRoom.getChatroomName());
-        String message = getString(R.string.chat_room_change_message, chatRoom.getChatroomName());
-
-        SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(title, message);
-        DialogUtils.show(this, dialogFragment, CHATROOM_CHANGED_DIALOG);
-    }
-
     private void updateTitleWithChatRoomName(final ChatRoom chatRoom) {
         final ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (supportActionBar != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    supportActionBar.setTitle(chatRoom.getChatroomName());
+                    supportActionBar.setTitle(chatRoom.getChatRoomName());
                 }
             });
         }
@@ -269,8 +279,75 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         });
     }
 
+    private void clearChat() {
+        int size = chatAdapter.getItemCount();
+        chatAdapter.getMessages().clear();
+        chatAdapter.notifyItemRangeRemoved(0, size);
+    }
 
+    private void setChatHistory(LinkedList<ChatMessage> messages) {
+        chatAdapter.getMessages().addAll(messages);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                chatAdapter.notifyDataSetChanged();
+            }
+        });
 
+    }
+
+    private void showChatRoomChangedDialog(ChatRoom chatRoom) {
+        String title = getString(R.string.chat_room_change, chatRoom.getChatRoomName());
+        String message = getString(R.string.chat_room_change_message, chatRoom.getChatRoomName());
+
+        SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(title, message);
+        DialogUtils.show(this, dialogFragment, CHATROOM_CHANGED_DIALOG);
+    }
+
+    private void showRetrievingChatDialog() {
+
+        final ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(getString(R.string.loading_chat_history));
+        DialogUtils.show(this, dialogFragment, CHATROOM_HISTORY_DIALOG);
+
+        ChatMessage firstMessage = chatAdapter.getFirstMessage();
+        ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
+
+        if (currentChatRoom != null && firstMessage != null) {
+            String url;
+            if (CommunitiesUtils.isEmulator()) {
+                url = getString(R.string.host_url_emulator);
+            } else {
+                url = getString(R.string.host_url);
+            }
+
+            url += "/chatHistory/page?chatRoomName=" + currentChatRoom.getChatRoomName() + "&lastMessageInChat=" + firstMessage.getId();
+
+            final GenericRequest<ChatMessage[]> request = new GenericRequest<>(Request.Method.GET, url, new HashMap<String, Object>(), ChatMessage[].class, new Response.Listener<ChatMessage[]>() {
+                @Override
+                public void onResponse(ChatMessage[] response) {
+                    if (response.length > 0) {
+                        final LinkedList<ChatMessage> messages = new LinkedList<>(Arrays.asList(response));
+                        chatAdapter.getMessages().addAll(0, messages);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                chatAdapter.notifyItemRangeInserted(0, messages.size());
+                            }
+                        });
+                    }
+                    dialogFragment.dismiss();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    dialogFragment.dismiss();
+                    //TODO Add error dialog for chat history
+                }
+            });
+
+            HttpHelper.getInstance(getActivity()).getRequestQueue().add(request);
+        }
+    }
     //    private void setupDrawerSlider(View view) {
 //        menuItems = getResources().getStringArray(R.array.menu_items);
 //        drawerLayout = (DrawerLayout) view.findViewById(R.id.drawer_layout);
