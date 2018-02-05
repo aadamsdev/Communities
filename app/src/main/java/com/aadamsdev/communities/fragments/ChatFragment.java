@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,13 +21,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.aadamsdev.communities.R;
@@ -46,14 +43,10 @@ import com.aadamsdev.communities.utils.PreferenceManager;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -119,7 +112,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                showRetrievingChatDialog();
+                getChatHistoryPage();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -304,15 +297,14 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         DialogUtils.show(this, dialogFragment, CHATROOM_CHANGED_DIALOG);
     }
 
-    private void showRetrievingChatDialog() {
-
-        final ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(getString(R.string.loading_chat_history));
-        DialogUtils.show(this, dialogFragment, CHATROOM_HISTORY_DIALOG);
-
+    private void getChatHistoryPage() {
         ChatMessage firstMessage = chatAdapter.getFirstMessage();
         ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
 
         if (currentChatRoom != null && firstMessage != null) {
+            final ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(getString(R.string.loading_chat_history));
+            DialogUtils.show(this, dialogFragment, CHATROOM_HISTORY_DIALOG);
+
             String url;
             if (CommunitiesUtils.isEmulator()) {
                 url = getString(R.string.host_url_emulator);
