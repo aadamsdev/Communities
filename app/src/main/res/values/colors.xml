@@ -23,6 +23,10 @@
     <color name="dot_light_screen3">#93c6fd</color>
     <color name="dot_light_screen4">#e4b5fc</color>
 
+    <color name="user_status_online">#4CAF50</color>
+    <color name="user_status_offline">#C0C0C0</color>
+
+
     <color name="editUnderLine">@color/colorText</color>
     <color name="textColorHint">@color/colorText</color>
 

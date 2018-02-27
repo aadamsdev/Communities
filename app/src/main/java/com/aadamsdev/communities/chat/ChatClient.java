@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.aadamsdev.communities.pojo.ChatMessage;
 import com.aadamsdev.communities.pojo.ChatRoom;
+import com.aadamsdev.communities.pojo.UserStatus;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
 import com.aadamsdev.communities.utils.PreferenceManager;
 import com.google.gson.Gson;
@@ -17,6 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.LinkedList;
+import java.util.List;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -30,9 +33,6 @@ import io.socket.emitter.Emitter;
 public class ChatClient implements android.location.LocationListener {
 
     private final static String TAG = ChatClient.class.getSimpleName();
-
-    //    //Define a request code to send to Google Play services
-    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     private static ChatClient client;
 
@@ -50,6 +50,7 @@ public class ChatClient implements android.location.LocationListener {
     private final static String INCOMING_MESSAGE = "incoming_message";
     private final static String LOCATION_UPDATE = "location_update";
     private final static String CHATROOM_UPDATE = "chatroom_update";
+    private final static String USER_STATUS_UPDATE = "user_status_update";
 
     private ChatClient() {
         gson = new Gson();
@@ -108,7 +109,7 @@ public class ChatClient implements android.location.LocationListener {
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-
+                Log.i(TAG, "Disconnected socket!!");
             }
         });
     }
@@ -195,6 +196,8 @@ public class ChatClient implements android.location.LocationListener {
         void onNewMessage(ChatMessage chatMessage);
 
         void onChatRoomChanged(ChatRoom chatRoom);
+
+        void onUserStatusesUpdated(UserStatus statuses);
     }
 }
 

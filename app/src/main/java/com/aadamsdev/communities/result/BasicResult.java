@@ -13,9 +13,6 @@ public class BasicResult {
     protected int code;
     protected String message;
 
-    public int getCode() { return code; }
-    public String getMessage() { return message; }
-
     public BasicResult() {
         this(0, null);
     }
@@ -27,5 +24,13 @@ public class BasicResult {
 
     public BasicResult(BasicResult result) {
         this(result.getCode(), result.getMessage());
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
