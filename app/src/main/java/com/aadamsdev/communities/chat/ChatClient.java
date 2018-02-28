@@ -38,6 +38,7 @@ public class ChatClient implements android.location.LocationListener {
 
     private Gson gson;
 
+    private String username;
     private String lastKnownChatRoom;
     private boolean isInChatRoom;
 
@@ -56,9 +57,15 @@ public class ChatClient implements android.location.LocationListener {
         gson = new Gson();
     }
 
+    public static ChatClient newInstance(String username) {
+        client = new ChatClient();
+        client.username = username;
+        return client;
+    }
+
     public static ChatClient getInstance() {
         if (client == null) {
-            client = new ChatClient();
+            Log.w(TAG, "Chat client hasn't been instantiated yet.");
         }
         return client;
     }
@@ -82,30 +89,40 @@ public class ChatClient implements android.location.LocationListener {
         socket.on(CHATROOM_UPDATE, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                JSONObject data = (JSONObject) args[0];
-                String dataStr = data.toString();
+                if (chatClientCallback != null) {
+                    String jsonString = getJsonStringFromSocketArgs(args);
 
-                ChatRoom chatRoom = gson.fromJson(dataStr, ChatRoom.class);
+                    ChatRoom chatRoom = gson.fromJson(jsonString, ChatRoom.class);
 
-                lastKnownChatRoom = chatRoom.getChatRoomName();
-                chatClientCallback.onChatRoomChanged(chatRoom);
+                    lastKnownChatRoom = chatRoom.getChatRoomName();
+                    chatClientCallback.onChatRoomChanged(chatRoom);
 
-                // Must be after callback; will not show dialog and retrieve chat history otherwise
-                isInChatRoom = true;
+                    // Must be after callback; will not show dialog and retrieve chat history otherwise
+                    isInChatRoom = true;
+                }
             }
 
         }).on(INCOMING_MESSAGE, new Emitter.Listener() {
             @Override
             public void call(final Object... args) {
                 if (chatClientCallback != null) {
-                    JSONObject data = (JSONObject) args[0];
-                    String dataStr = data.toString();
+                    String jsonString = getJsonStringFromSocketArgs(args);
 
-                    ChatMessage chatMessage = gson.fromJson(dataStr, ChatMessage.class);
+                    ChatMessage chatMessage = gson.fromJson(jsonString, ChatMessage.class);
                     chatClientCallback.onNewMessage(chatMessage);
                 }
             }
 
+        }).on(USER_STATUS_UPDATE, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (chatClientCallback != null) {
+                    String jsonString = getJsonStringFromSocketArgs(args);
+
+                    UserStatus status = gson.fromJson(jsonString, UserStatus.class);
+                    chatClientCallback.onUserStatusesUpdated(status);
+                }
+            }
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
@@ -114,7 +131,12 @@ public class ChatClient implements android.location.LocationListener {
         });
     }
 
-    public void sendMessage(String username, String message, String chatRoomName) {
+    private String getJsonStringFromSocketArgs(Object... args) {
+        JSONObject data = (JSONObject) args[0];
+        return data.toString();
+    }
+
+    public void sendMessage(String message, String chatRoomName) {
         JSONObject object = new JSONObject();
 
         try {
@@ -137,15 +159,16 @@ public class ChatClient implements android.location.LocationListener {
             double currentLatitude = location.getLatitude();
             double currentLongitude = location.getLongitude();
 
-            JSONObject coordinates = new JSONObject();
+            JSONObject jsonObject = new JSONObject();
 
             try {
-                coordinates.put("latitude", currentLatitude);
-                coordinates.put("longitude", currentLongitude);
-                coordinates.put("lastKnownChatRoom", lastKnownChatRoom);
+                jsonObject.put("latitude", currentLatitude);
+                jsonObject.put("longitude", currentLongitude);
+                jsonObject.put("lastKnownChatRoom", lastKnownChatRoom);
+                jsonObject.put("username", username);
 
                 socket.connect();
-                socket.emit(LOCATION_UPDATE, coordinates);
+                socket.emit(LOCATION_UPDATE, jsonObject);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -186,6 +209,10 @@ public class ChatClient implements android.location.LocationListener {
 
     public boolean isInChatRoom() {
         return isInChatRoom;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public void registerCallback(ChatClientCallback chatClientCallback) {

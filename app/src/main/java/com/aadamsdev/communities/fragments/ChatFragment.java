@@ -204,7 +204,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         });
 
         ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
-        if ((currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) || !ChatClient.getInstance().isInChatRoom()) {
+        if ((currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) || chatClient.isInChatRoom()) {
             showChatRoomChangedDialog(newChatRoom);
 
             updateTitleWithChatRoomName(newChatRoom);
@@ -215,9 +215,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             scrollToBottomOfChat();
 
 
-            for (int i = 0; i < 15; ++i) {
-                onUserStatusesUpdated(new UserStatus("sdlkjflsdjfsldkfj " + i, i % 2 == 0));
-            }
+//            for (int i = 0; i < 15; ++i) {
+//                onUserStatusesUpdated(new UserStatus("sdlkjflsdjfsldkfj " + i, i % 2 == 0));
+//            }
         }
     }
 
@@ -250,7 +250,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     private void initChatClient() {
-        chatClient = ChatClient.getInstance();
+        String username = PreferenceManager.getInstance(getActivity()).getCurrentUser();
+        chatClient = ChatClient.newInstance(username);
         chatClient.connect();
     }
 
@@ -258,13 +259,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         String message = messageEditText.getText().toString();
         messageEditText.getText().clear();
 
-        String currentUsername = PreferenceManager.getInstance(getActivity()).getCurrentUser();
-
         ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
         if (currentChatRoom != null) {
-            chatClient.sendMessage(currentUsername, message, currentChatRoom.getChatRoomName());
+            chatClient.sendMessage(message, currentChatRoom.getChatRoomName());
         } else {
-            chatClient.sendMessage(currentUsername, message, null);
+            chatClient.sendMessage(message, null);
         }
     }
 
@@ -272,13 +271,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.show();
-        }
-    }
-
-    private void hideActionBar() {
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
         }
     }
 
