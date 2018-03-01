@@ -26,8 +26,8 @@ public class UserStatus {
         return isOnline;
     }
 
-    public void setOnline(Boolean online) {
-        isOnline = online;
+    public void setIsOnline(Boolean isOnline) {
+        this.isOnline = isOnline;
     }
 
     @Override

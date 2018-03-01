@@ -83,7 +83,7 @@ public class UserStatusAdapter extends Adapter<UserStatusAdapter.UserStatusViewH
         int index = statuses.indexOf(status);
         if (index != -1) {
             UserStatus toUpdate = statuses.get(index);
-            toUpdate.setOnline(status.isOnline());
+            toUpdate.setIsOnline(status.isOnline());
         } else {
             add(status);
         }

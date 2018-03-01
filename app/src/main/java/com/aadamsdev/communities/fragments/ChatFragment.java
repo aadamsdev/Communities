@@ -52,6 +52,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -214,7 +215,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             setChatHistory(newChatRoom.getMessages());
             scrollToBottomOfChat();
 
-
+            clearUserStatuses();
+            setUserStatuses(newChatRoom.getStatuses());
 //            for (int i = 0; i < 15; ++i) {
 //                onUserStatusesUpdated(new UserStatus("sdlkjflsdjfsldkfj " + i, i % 2 == 0));
 //            }
@@ -322,6 +324,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         });
     }
 
+    private void clearUserStatuses() {
+        userStatusAdapter.getStatuses().clear();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int size = userStatusAdapter.getItemCount();
+                userStatusAdapter.notifyItemRangeRemoved(0, size);
+            }
+        });
+    }
+
     private void setChatHistory(LinkedList<ChatMessage> messages) {
         chatAdapter.getMessages().addAll(messages);
         getActivity().runOnUiThread(new Runnable() {
@@ -332,6 +345,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         });
     }
 
+    private void setUserStatuses(ArrayList<UserStatus> statuses) {
+        userStatusAdapter.getStatuses().addAll(statuses);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                userStatusAdapter.notifyDataSetChanged();
+            }
+        });
+    }
     private void showChatRoomChangedDialog(ChatRoom chatRoom) {
         String title = getString(R.string.chat_room_change, chatRoom.getChatRoomName());
         String message = getString(R.string.chat_room_change_message, chatRoom.getChatRoomName());
