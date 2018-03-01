@@ -210,17 +210,14 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
             updateTitleWithChatRoomName(newChatRoom);
             PreferenceManager.getInstance(getActivity()).setLastKnownChatRoom(newChatRoom);
-
-            clearChat();
-            setChatHistory(newChatRoom.getMessages());
-            scrollToBottomOfChat();
-
-            clearUserStatuses();
-            setUserStatuses(newChatRoom.getStatuses());
-//            for (int i = 0; i < 15; ++i) {
-//                onUserStatusesUpdated(new UserStatus("sdlkjflsdjfsldkfj " + i, i % 2 == 0));
-//            }
         }
+
+        clearChat();
+        setChatHistory(newChatRoom.getMessages());
+        scrollToBottomOfChat();
+
+        clearUserStatuses();
+        setUserStatuses(newChatRoom.getStatuses());
     }
 
     @Override
