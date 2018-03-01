@@ -204,7 +204,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
         });
 
         ChatRoom currentChatRoom = PreferenceManager.getInstance(getActivity()).getLastChatRoom();
-        if ((currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) || chatClient.isInChatRoom()) {
+        if ((currentChatRoom != null && !currentChatRoom.getChatRoomName().equals(newChatRoom.getChatRoomName())) || !chatClient.isInChatRoom()) {
             showChatRoomChangedDialog(newChatRoom);
 
             updateTitleWithChatRoomName(newChatRoom);
