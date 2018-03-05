@@ -56,9 +56,9 @@ public class UserStatusAdapter extends Adapter<UserStatusAdapter.UserStatusViewH
         Log.i(TAG, "Binding view holder " + status.toString() + " " + holder.toString());
 
         holder.username.setText(status.getUsername());
-        holder.status.setImageDrawable(status.isOnline() != null && status.isOnline() ?
+        holder.username.setCompoundDrawablesWithIntrinsicBounds(status.isOnline() != null && status.isOnline() ?
                 ContextCompat.getDrawable(context, R.drawable.user_status_online)
-                : ContextCompat.getDrawable(context, R.drawable.user_status_offline));
+                : ContextCompat.getDrawable(context, R.drawable.user_status_offline), null, null, null);
     }
 
     @Override
@@ -93,9 +93,6 @@ public class UserStatusAdapter extends Adapter<UserStatusAdapter.UserStatusViewH
 
         @BindView(R.id.username)
         TextView username;
-
-        @BindView(R.id.status)
-        ImageView status;
 
         UserStatusViewHolder(View itemView) {
             super(itemView);
