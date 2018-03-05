@@ -1,6 +1,5 @@
 package com.aadamsdev.communities.chat;
 
-import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -11,15 +10,12 @@ import com.aadamsdev.communities.pojo.ChatMessage;
 import com.aadamsdev.communities.pojo.ChatRoom;
 import com.aadamsdev.communities.pojo.UserStatus;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
-import com.aadamsdev.communities.utils.PreferenceManager;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;

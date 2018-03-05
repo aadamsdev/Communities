@@ -83,9 +83,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-
     @BindView(R.id.swipeRefreshLayout)
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -222,7 +219,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     @Override
     public void onUserStatusesUpdated(UserStatus status) {
-        userStatusAdapter.add(status);
+        userStatusAdapter.updateStatus(status);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

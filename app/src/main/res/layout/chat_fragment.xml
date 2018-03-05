@@ -6,15 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        app:titleTextColor="@android:color/white" />
-
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
@@ -55,7 +46,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toStartOf="@+id/send_button"
                     android:background="@color/colorBackground"
-                    android:hint="Message #chatroom" />
+                    android:hint="@string/send_message" />
 
                 <ImageButton
                     android:id="@+id/send_button"
@@ -66,7 +57,7 @@
                     android:layout_marginStart="8dp"
                     android:adjustViewBounds="true"
                     android:background="@drawable/send_button"
-                    android:contentDescription="Send message"
+                    android:contentDescription="@string/send_message"
                     android:scaleType="fitCenter"
                     android:visibility="gone"
                     app:srcCompat="@drawable/ic_send_black_24dp" />
@@ -74,12 +65,27 @@
         </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/status_recycler_view"
-        android:layout_width="256dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start|left"
-        android:background="@android:color/white" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:background="@android:color/white">
+
+        <TextView
+            android:id="@+id/users_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/users"
+            android:textSize="16sp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/status_recycler_view"
+            android:layout_width="256dp"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/users_header"
+            android:layout_marginStart="16dp" />
+    </RelativeLayout>
 
 </android.support.v4.widget.DrawerLayout>
 
