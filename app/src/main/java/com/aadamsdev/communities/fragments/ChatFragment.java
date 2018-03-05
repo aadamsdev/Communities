@@ -214,13 +214,23 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
     @Override
     public void onUserStatusesUpdated(UserStatus status) {
-        userStatusAdapter.updateStatus(status);
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                userStatusAdapter.notifyDataSetChanged();
-            }
-        });
+        final int updatedIndex = userStatusAdapter.updateStatus(status);
+        if (updatedIndex != -1) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    userStatusAdapter.notifyItemChanged(updatedIndex);
+                }
+            });
+        } else {
+           userStatusAdapter.add(status);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    userStatusAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     @Override
@@ -314,7 +324,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     private void clearUserStatuses() {
-        userStatusAdapter.getStatuses().clear();
+        userStatusAdapter.clearStatuses();
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -335,7 +345,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     }
 
     private void setUserStatuses(ArrayList<UserStatus> statuses) {
-        userStatusAdapter.getStatuses().addAll(statuses);
+        userStatusAdapter.addUserStatusList(statuses);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -343,6 +353,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
             }
         });
     }
+
     private void showChatRoomChangedDialog(ChatRoom chatRoom) {
         String title = getString(R.string.chat_room_change, chatRoom.getChatRoomName());
         String message = getString(R.string.chat_room_change_message, chatRoom.getChatRoomName());

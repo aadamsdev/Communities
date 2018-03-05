@@ -18,6 +18,7 @@ import com.aadamsdev.communities.pojo.UserStatus;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,22 +72,29 @@ public class UserStatusAdapter extends Adapter<UserStatusAdapter.UserStatusViewH
         return statuses.size();
     }
 
-    public void add(UserStatus status) {
-        statuses.add(status);
-    }
-
     public ArrayList<UserStatus> getStatuses() {
         return statuses;
     }
 
-    public void updateStatus(UserStatus status) {
+    public void add(UserStatus status) {
+        statuses.add(status);
+    }
+
+    public void addUserStatusList(List<UserStatus> statusList) {
+        statuses.addAll(statusList);
+    }
+
+    public int updateStatus(UserStatus status) {
         int index = statuses.indexOf(status);
         if (index != -1) {
             UserStatus toUpdate = statuses.get(index);
             toUpdate.setIsOnline(status.isOnline());
-        } else {
-            add(status);
         }
+        return index;
+    }
+
+    public void clearStatuses() {
+        statuses.clear();
     }
 
     class UserStatusViewHolder extends RecyclerView.ViewHolder {
@@ -97,13 +105,6 @@ public class UserStatusAdapter extends Adapter<UserStatusAdapter.UserStatusViewH
         UserStatusViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i(TAG, "USER STATUS CLICKED");
-                }
-            });
         }
     }
 }
