@@ -4,6 +4,7 @@ package com.aadamsdev.communities.chat;
  * Created by Andrew Adams on 6/24/2017.
  */
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,15 +28,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     private final String TAG = ChatAdapter.class.getSimpleName();
 
+    private Context context;
     private DateFormat dateFormat;
     private LinkedList<ChatMessage> messages;
 
-    public ChatAdapter() {
+    public ChatAdapter(Context context) {
+        this.context = context;
         messages = new LinkedList<>();
         init();
     }
 
-    public ChatAdapter(LinkedList<ChatMessage> messages) {
+    public ChatAdapter(Context context, LinkedList<ChatMessage> messages) {
+        this.context = context;
         this.messages = messages;
         init();
     }

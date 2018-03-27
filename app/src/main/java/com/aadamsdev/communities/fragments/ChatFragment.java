@@ -108,7 +108,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        chatAdapter = new ChatAdapter();
+        chatAdapter = new ChatAdapter(getActivity());
         userStatusAdapter = new UserStatusAdapter(getActivity());
 
         chatClient.registerCallback(this);
