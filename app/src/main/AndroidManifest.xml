@@ -14,9 +14,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/BaseAppTheme">
 
-        <activity android:name=".activities.SplashActivity">
+        <activity
+            android:name=".activities.SplashActivity"
+            android:theme="@style/LoginTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +26,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.ChatActivity"></activity>
+        <activity
+            android:name=".activities.ChatActivity"
+            android:theme="@style/BaseAppTheme" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
