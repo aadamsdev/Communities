@@ -23,11 +23,5 @@ public class HttpUtils {
     private final static String baseUrlEmulator = "http://10.0.2.2:8080"; // TODO: LOCALHOST EMULATOR
     private final static String baseUrl = "http://192.168.0.10:8090"; // TODO: LOCALHOST EMULATOR
 
-    public static void getChatHistoryByPage(Context context, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener) {
-        RequestQueue queue = Volley.newRequestQueue(context);
 
-        JsonObjectRequest request = new JsonObjectRequest(baseUrl + "/product_gallery_item/all", null, responseListener, errorListener);
-
-        queue.add(request);
-    }
 }

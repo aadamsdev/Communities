@@ -1,36 +1,42 @@
 package com.aadamsdev.communities.result;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by andrewadams on 2017-12-27.
  */
 public class BasicResult {
-    public static final int CODE_SUCCESS = 0;
+    @SerializedName("success")
+    private Boolean isSuccessful;
 
-    public static BasicResult genericSuccess() {
-        return new BasicResult(CODE_SUCCESS, "");
+    private String errorMessage;
+
+    public BasicResult(Boolean isSuccessful, String message) {
+        this.isSuccessful = isSuccessful;
+        this.errorMessage = message;
     }
 
-    protected int code;
-    protected String message;
-
-    public BasicResult() {
-        this(0, null);
+    public Boolean isSuccessful() {
+        return isSuccessful;
     }
 
-    public BasicResult(int code, String message) {
-        this.code = code;
-        this.message = message;
+    public void setSuccessful(Boolean successful) {
+        isSuccessful = successful;
     }
 
-    public BasicResult(BasicResult result) {
-        this(result.getCode(), result.getMessage());
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
-    public int getCode() {
-        return code;
+    public void setErrorMessage(String message) {
+        this.errorMessage = message;
     }
 
-    public String getMessage() {
-        return message;
+    @Override
+    public String toString() {
+        return "BasicResult{" +
+                "isSuccessful=" + isSuccessful +
+                ", errorMessage='" + errorMessage + '\'' +
+                '}';
     }
 }

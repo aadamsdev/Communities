@@ -33,10 +33,10 @@ public class GenericRequest<T> extends JsonRequest<T> {
     private Map<String, String> headers;
     private Map<String, Object> params;
 
-    public GenericRequest(int method, String url, Map<String, Object> params, Class clazz,
+    public GenericRequest(int method, String url, Map<String, Object> params, Class _class,
                           Response.Listener<T> listener, Response.ErrorListener errorListener) {
         super(method, url, gson.toJson(params), listener, errorListener);
-        this._class = clazz;
+        this._class = _class;
         this.listener = listener;
         if (params != null) {
             this.params = params;
