@@ -1,49 +1,37 @@
 package com.aadamsdev.communities.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aadamsdev.communities.R;
 import com.aadamsdev.communities.activities.ChatActivity;
+import com.aadamsdev.communities.dialogs.ProgressDialogFragment;
+import com.aadamsdev.communities.dialogs.SimpleDialogFragment;
 import com.aadamsdev.communities.request.GenericRequest;
 import com.aadamsdev.communities.result.BasicResult;
 import com.aadamsdev.communities.utils.CommunitiesUtils;
+import com.aadamsdev.communities.utils.DialogUtils;
 import com.aadamsdev.communities.utils.HttpHelper;
 import com.aadamsdev.communities.utils.PreferenceManager;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static android.content.SharedPreferences.*;
 
 /**
  * Created by Andrew Adams on 6/10/2017.
@@ -51,6 +39,9 @@ import static android.content.SharedPreferences.*;
 public class SplashFragment extends Fragment implements View.OnClickListener {
 
     private final String TAG = SplashFragment.class.getSimpleName();
+
+    private final String SPLASH_FRAGMENT_LOADING_DIALOG = "splashFragmentLoadingDialog";
+    private final String SPLASH_FRAGMENT_ERROR_DIALOG = "splashFragmentErrorDialog";
 
     private PreferenceManager preferenceManager;
 
@@ -137,19 +128,29 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
         requestParams.put("username", username);
         requestParams.put("password", password);
 
+        final ProgressDialogFragment dialogFragment = ProgressDialogFragment.newInstance(getString(R.string.logging_in));
+        DialogUtils.show(this, dialogFragment, SPLASH_FRAGMENT_LOADING_DIALOG);
+
         GenericRequest<BasicResult> request = new GenericRequest<>(Request.Method.POST, url + "/user/login", requestParams, BasicResult.class, new Response.Listener<BasicResult>() {
             @Override
             public void onResponse(BasicResult response) {
+                DialogUtils.dismiss(dialogFragment, SPLASH_FRAGMENT_LOADING_DIALOG);
+
                 if (response.isSuccessful()) {
                     launchChatActivity();
                 } else {
-                    Log.i(TAG, response.toString());
-                    Toast.makeText(getActivity(), "Unsuccessful login", Toast.LENGTH_SHORT).show();
+                    SimpleDialogFragment simpleDialogFragment = SimpleDialogFragment.newInstance(getString(R.string.login_error), response.getErrorMessage());
+                    DialogUtils.show(SplashFragment.this, simpleDialogFragment, SPLASH_FRAGMENT_ERROR_DIALOG);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                DialogUtils.dismiss(dialogFragment, SPLASH_FRAGMENT_LOADING_DIALOG);
+
+                SimpleDialogFragment simpleDialogFragment = SimpleDialogFragment.newInstance(getString(R.string.network_error), error.toString());
+                DialogUtils.show(SplashFragment.this, simpleDialogFragment, SPLASH_FRAGMENT_ERROR_DIALOG);
+
                 Log.e(TAG, error.toString());
             }
         });
