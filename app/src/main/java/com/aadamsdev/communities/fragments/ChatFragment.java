@@ -253,7 +253,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener, Chat
     private void initChatClient() {
         String username = PreferenceManager.getInstance(getActivity()).getCurrentUser();
         chatClient = ChatClient.newInstance(username);
-        chatClient.connect();
+        chatClient.connect(getString(R.string.host_url));
     }
 
     private void sendMessage() {

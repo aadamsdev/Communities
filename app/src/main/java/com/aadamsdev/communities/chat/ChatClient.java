@@ -66,12 +66,12 @@ public class ChatClient implements android.location.LocationListener {
         return client;
     }
 
-    public void connect() {
+    public void connect(String baseUrl) {
         try {
             if (CommunitiesUtils.isEmulator()) {
                 socket = IO.socket("http://10.0.2.2:8000/");
             } else {
-                socket = IO.socket(HOST_URL);
+                socket = IO.socket(baseUrl);
             }
             isInChatRoom = false;
             registerEvents();

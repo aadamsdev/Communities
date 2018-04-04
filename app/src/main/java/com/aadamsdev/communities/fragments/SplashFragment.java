@@ -77,7 +77,6 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
 //        } else {
 //            preferenceManager.setFirstTimeLaunch(false);
 //        }
-
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -121,7 +120,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
             url = getString(R.string.host_url);
         }
 
-        String username = usernameField.getText().toString().trim().toLowerCase();
+        final String username = usernameField.getText().toString().trim().toLowerCase();
         String password = passwordField.getText().toString();
 
         HashMap<String, Object> requestParams = new HashMap<>();
@@ -137,6 +136,7 @@ public class SplashFragment extends Fragment implements View.OnClickListener {
                 DialogUtils.dismiss(dialogFragment, SPLASH_FRAGMENT_LOADING_DIALOG);
 
                 if (response.isSuccessful()) {
+                    PreferenceManager.getInstance(getActivity()).setUsername(username);
                     launchChatActivity();
                 } else {
                     SimpleDialogFragment simpleDialogFragment = SimpleDialogFragment.newInstance(getString(R.string.login_error), response.getErrorMessage());

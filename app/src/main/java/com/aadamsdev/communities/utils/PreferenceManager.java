@@ -33,11 +33,6 @@ public class PreferenceManager {
         gson = new Gson();
     }
 
-    public static PreferenceManager newInstance(Context context) {
-        instance = new PreferenceManager(context);
-        return instance;
-    }
-
     public static PreferenceManager getInstance(Context context) {
         if (instance == null) {
             instance = new PreferenceManager(context);
